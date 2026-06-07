@@ -2,21 +2,15 @@ from infrastructure.vector_store import VectorStore
 from infrastructure.llm_client import LLMClient
 from infrastructure.log_repository import LogRepository
 
-_PROMPT_CON_CONTEXTO = (
-    "Eres Juanito el Inge, el asistente del area de Ingenieria en Diseno. "
-    "Responde de forma clara, formal y amable. "
-    "Usa unicamente la informacion del contexto proporcionado. "
-    "No menciones el origen de la informacion ni hagas aclaraciones sobre fuentes o documentos. "
-    "Evita repetir innecesariamente el nombre del tema que ya quedo establecido en la pregunta. "
-    "Usa negrita (**texto**) para resaltar terminos tecnicos clave."
-)
-
-_PROMPT_SIN_CONTEXTO = (
-    "Eres Juanito el Inge, el asistente del area de Ingenieria en Diseno. "
-    "Responde de forma clara y amable usando tu conocimiento general sobre ingenieria en diseno. "
-    "No hagas aclaraciones sobre el origen de la informacion ni menciones documentos. "
-    "Evita repetir innecesariamente el nombre del tema que ya quedo establecido en la pregunta. "
-    "Usa negrita (**texto**) para resaltar terminos tecnicos clave."
+_SYSTEM_PROMPT = (
+    "Eres Juanito el Inge, asistente institucional del Área de Ingeniería en Diseño. "
+    "Tu tono debe ser formal, claro, amable e institucional. "
+    "Responde únicamente con información respaldada por los documentos oficiales recuperados. "
+    "Si usas información recuperada, cita cada fuente explícitamente en el formato [Fuente: nombre_documento.ext]. "
+    "Si empleas varias fuentes, menciona todas las fuentes utilizadas. "
+    "No agregues contenido que no esté presente en el contexto proporcionado. "
+    "Interpreta correctamente la jerga estudiantil, por ejemplo: 'que vaina' puede referirse a un trámite, 'blueprint' a un plano, 'pa pedir un permiso' a un procedimiento administrativo. "
+    "Si la pregunta está fuera del alcance del Área de Ingeniería en Diseño o no hay contenido recuperado suficiente, rechaza la consulta de forma protocolar y amable."
 )
 
 
@@ -42,11 +36,18 @@ class ChatService:
         contexto_extra: str = "",
     ) -> str:
         fragmentos = await self._vector_store.buscar(texto, self._top_k, self._threshold)
-        hay_contexto = bool(fragmentos or contexto_extra)
+        if not fragmentos and not contexto_extra:
+            respuesta = (
+                "Lo siento, soy Juanito el Inge y no puedo responder esa consulta porque no corresponde al área de Ingeniería en Diseño "
+                "o no se obtuvo información suficiente de los documentos oficiales disponibles. "
+                "Por favor, formula una pregunta específica relacionada con trámites, planos, materiales o normas del área."
+            )
+            await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
+            return respuesta
 
-        prompt = self._construir_prompt(texto, fragmentos, contexto_extra, hay_contexto)
+        prompt = self._construir_prompt(texto, fragmentos, contexto_extra)
         respuesta = await self._llm.generar(prompt)
-        await self._logs.guardar(user_id, texto, respuesta, resuelta=hay_contexto)
+        await self._logs.guardar(user_id, texto, respuesta, resuelta=bool(fragmentos or contexto_extra))
         return respuesta
 
     def _construir_prompt(
@@ -54,24 +55,16 @@ class ChatService:
         consulta: str,
         fragmentos: list[str],
         contexto_extra: str = "",
-        hay_contexto: bool = True,
     ) -> str:
-        sistema = _PROMPT_CON_CONTEXTO if hay_contexto else _PROMPT_SIN_CONTEXTO
-        if hay_contexto:
-            partes = []
-            if fragmentos:
-                partes.append("Base de conocimiento:\n" + "\n\n".join(fragmentos))
-            if contexto_extra:
-                partes.append("Documentos de la sesion:\n" + contexto_extra)
-            contexto = "\n\n---\n\n".join(partes)
-            return (
-                f"{sistema}\n\n"
-                f"Contexto:\n{contexto}\n\n"
-                f"Pregunta: {consulta}\n"
-                f"Respuesta:"
-            )
+        partes = []
+        if fragmentos:
+            partes.append("Documentos oficiales recuperados:\n" + "\n\n".join(fragmentos))
+        if contexto_extra:
+            partes.append("Documentos cargados en la sesión:\n" + contexto_extra)
+        contexto = "\n\n---\n\n".join(partes)
         return (
-            f"{sistema}\n\n"
+            f"{_SYSTEM_PROMPT}\n\n"
+            f"Contexto:\n{contexto}\n\n"
             f"Pregunta: {consulta}\n"
             f"Respuesta:"
         )
