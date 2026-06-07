@@ -85,12 +85,12 @@ El script detecta automáticamente el tema de cada documento según su nombre:
 
 | Palabra clave en nombre | Tema asignado              |
 |-------------------------|----------------------------|
-| `pensum`                | Pensum y Materias          |
-| `licitacion`            | Licitaciones y Contratos   |
-| `proceso`               | Trámites Administrativos   |
-| `plano`                 | Normas de Diseño           |
-| `financiero`            | Presupuesto y Finanzas     |
-| `seguridad`             | Seguridad en Obras         |
+| `pensum`                | Pensum y materias          |
+| `licitacion`            | Licitaciones y contratos   |
+| `proceso`               | Trámites administrativos   |
+| `plano`                 | Normas de diseño           |
+| `financiero`            | Presupuesto y finanzas     |
+| `seguridad`             | Seguridad en obras         |
 | *(cualquier otro)*      | General                    |
 
 ---
@@ -136,8 +136,8 @@ Evalúa 12 consultas (8 institucionales + 4 fuera de alcance). El criterio de ap
 
 | Módulo | Responsable      | Área                              |
 |--------|------------------|-----------------------------------|
-| 1      | Luis Millán      | Base de Conocimientos             |
+| 1      | Luis Millán      | Base de conocimientos             |
 | 2      | Arnaldo Perdomo  | IA y PLN                          |
-| 3      | Yvanna Bravo     | Interfaz Web                      |
-| 4      | Keibel Guilarte  | Pruebas y Control de Calidad      |
-| 5      | Alejandro Duarte | Infraestructura y Soporte         |
+| 3      | Yvanna Bravo     | Interfaz web                      |
+| 4      | Keibel Guilarte  | Pruebas y control de calidad      |
+| 5      | Alejandro Duarte | Infraestructura y soporte         |

@@ -21,8 +21,8 @@
         }
         .glass {
             background: var(--surface);
-            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.4);
             box-shadow: 0 8px 32px rgba(0,0,0,0.05);
         }
@@ -124,7 +124,7 @@
         <!-- ── Sidebar izquierdo ── -->
         <aside class="w-16 lg:w-60 border-r border-white/20 hidden md:flex flex-col p-4 flex-shrink-0 gap-4">
 
-            <button id="btnNuevoChat"
+            <button type="button" id="btnNuevoChat"
                 class="w-full flex items-center justify-center lg:justify-start gap-3 p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-200 flex-shrink-0">
                 <i data-lucide="square-pen" class="w-4 h-4 flex-shrink-0"></i>
                 <span class="text-sm font-medium hidden lg:block">Nueva conversación</span>
@@ -156,7 +156,7 @@
             <div class="px-6 pb-1 md:px-10 md:pb-2 pt-4 bg-gradient-to-t from-white via-white to-transparent flex-shrink-0">
                 <div class="max-w-3xl mx-auto">
                     <div class="flex items-center bg-white border border-gray-200 rounded-[20px] p-2 pr-4 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
-                        <button id="btnUpload" title="Adjuntar PDF a esta conversación"
+                        <button type="button" id="btnUpload" title="Adjuntar PDF a esta conversación"
                             class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors flex-shrink-0">
                             <i data-lucide="paperclip" class="w-5 h-5"></i>
                         </button>
@@ -219,7 +219,7 @@
                 </div>
                 <!-- Selector de material -->
                 <div class="relative">
-                    <button id="matDropdownBtn" onclick="toggleMatDropdown()"
+                    <button type="button" id="matDropdownBtn" onclick="toggleMatDropdown()"
                         class="w-full flex items-center justify-between gap-2 px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm">
                         <div class="flex items-center gap-2">
                             <i data-lucide="layers" class="w-4 h-4 text-gray-400"></i>
@@ -229,18 +229,18 @@
                     </button>
                     <div id="matDropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
                         <div class="py-1 max-h-52 overflow-y-auto thin-scroll">
-                            <button onclick="seleccionarMaterial('titanio',          'Titanio')"          class="mat-option">Titanio</button>
-                            <button onclick="seleccionarMaterial('acero',            'Acero')"            class="mat-option">Acero</button>
-                            <button onclick="seleccionarMaterial('aluminio',         'Aluminio')"         class="mat-option">Aluminio</button>
-                            <button onclick="seleccionarMaterial('cobre',            'Cobre')"            class="mat-option">Cobre</button>
-                            <button onclick="seleccionarMaterial('inconel',          'Inconel')"          class="mat-option">Inconel</button>
-                            <button onclick="seleccionarMaterial('fibra de carbono', 'Fibra de carbono')" class="mat-option">Fibra de carbono</button>
-                            <button onclick="seleccionarMaterial('polímero',         'Polímero')"         class="mat-option">Polímero</button>
-                            <button onclick="seleccionarMaterial('cerámica',         'Cerámica')"         class="mat-option">Cerámica</button>
-                            <button onclick="seleccionarMaterial('magnesio',         'Magnesio')"         class="mat-option">Magnesio</button>
-                            <button onclick="seleccionarMaterial('resina',           'Resina')"           class="mat-option">Resina</button>
-                            <button onclick="seleccionarMaterial('bronce',           'Bronce')"           class="mat-option">Bronce</button>
-                            <button onclick="seleccionarMaterial('acero inoxidable', 'Acero inoxidable')" class="mat-option">Acero inoxidable</button>
+                            <button type="button" onclick="seleccionarMaterial('titanio',          'Titanio')"          class="mat-option">Titanio</button>
+                            <button type="button" onclick="seleccionarMaterial('acero',            'Acero')"            class="mat-option">Acero</button>
+                            <button type="button" onclick="seleccionarMaterial('aluminio',         'Aluminio')"         class="mat-option">Aluminio</button>
+                            <button type="button" onclick="seleccionarMaterial('cobre',            'Cobre')"            class="mat-option">Cobre</button>
+                            <button type="button" onclick="seleccionarMaterial('inconel',          'Inconel')"          class="mat-option">Inconel</button>
+                            <button type="button" onclick="seleccionarMaterial('fibra de carbono', 'Fibra de carbono')" class="mat-option">Fibra de carbono</button>
+                            <button type="button" onclick="seleccionarMaterial('polímero',         'Polímero')"         class="mat-option">Polímero</button>
+                            <button type="button" onclick="seleccionarMaterial('cerámica',         'Cerámica')"         class="mat-option">Cerámica</button>
+                            <button type="button" onclick="seleccionarMaterial('magnesio',         'Magnesio')"         class="mat-option">Magnesio</button>
+                            <button type="button" onclick="seleccionarMaterial('resina',           'Resina')"           class="mat-option">Resina</button>
+                            <button type="button" onclick="seleccionarMaterial('bronce',           'Bronce')"           class="mat-option">Bronce</button>
+                            <button type="button" onclick="seleccionarMaterial('acero inoxidable', 'Acero inoxidable')" class="mat-option">Acero inoxidable</button>
                         </div>
                     </div>
                 </div>
