@@ -55,8 +55,8 @@ class ChatService:
                     "al Área de Administración, Diseño e Ingeniería, por lo que fue ignorado."
                 )
 
-        if not consulta_ade:
-            respuesta = REJECT_MESSAGE + advertencia_sesion
+       # if not consulta_ade:
+#     respuesta = REJECT_MESSAGE + advertencia_sesion
             await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
             return respuesta
 
