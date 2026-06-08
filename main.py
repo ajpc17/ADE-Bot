@@ -79,6 +79,7 @@ async def lifespan(app: FastAPI):
     vector_store = ChromaVectorStore(
         path=chroma_path,
         api_key=_obtener_chroma_api_key(),
+        model="gemini-embedding-001",
     )
     llm_client = _crear_llm_client()
     log_repository = SQLiteLogRepository(path=sqlite_path)
@@ -88,7 +89,7 @@ async def lifespan(app: FastAPI):
         llm_client=llm_client,
         log_repository=log_repository,
         top_k=int(os.getenv("TOP_K", 4)),
-        similarity_threshold=float(os.getenv("SIMILARITY_THRESHOLD", 0.75)),
+        similarity_threshold=float(os.getenv("SIMILARITY_THRESHOLD", 0.60)),
     )
     yield
 

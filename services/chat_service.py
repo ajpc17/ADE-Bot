@@ -21,7 +21,7 @@ class ChatService:
         llm_client: LLMClient,
         log_repository: LogRepository,
         top_k: int = 4,
-        similarity_threshold: float = 0.75,
+        similarity_threshold: float = 0.60,
     ):
         self._vector_store = vector_store
         self._llm = llm_client
@@ -35,7 +35,10 @@ class ChatService:
         user_id: int,
         contexto_extra: str = "",
     ) -> str:
-        fragmentos = await self._vector_store.buscar(texto, self._top_k, self._threshold)
+        print(f"[DEBUG] ChatService.procesar_consulta texto={texto!r} top_k={self._top_k} threshold={self._threshold}")
+        # Forzamos threshold a 0.0 para ignorar el filtro matemático defectuoso
+        fragmentos = await self._vector_store.buscar(texto, self._top_k, 0.0) 
+        print(f"[DEBUG] ChatService received {len(fragmentos)} fragmentos")
         if not fragmentos and not contexto_extra:
             respuesta = (
                 "Lo siento, soy Juanito el Inge y no puedo responder esa consulta porque no corresponde al área de Ingeniería en Diseño "
