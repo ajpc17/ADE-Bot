@@ -1,22 +1,23 @@
 from infrastructure.vector_store import VectorStore
 from infrastructure.llm_client import LLMClient
 from infrastructure.log_repository import LogRepository
+from services.ade_dictionary import REJECT_MESSAGE, texto_es_ade
 
-_PROMPT_CON_CONTEXTO = (
-    "Eres Juanito el Inge, el asistente del area de Ingenieria en Diseno. "
-    "Responde de forma clara, formal y amable. "
-    "Usa unicamente la informacion del contexto proporcionado. "
-    "No menciones el origen de la informacion ni hagas aclaraciones sobre fuentes o documentos. "
-    "Evita repetir innecesariamente el nombre del tema que ya quedo establecido en la pregunta. "
-    "Usa negrita (**texto**) para resaltar terminos tecnicos clave."
-)
-
-_PROMPT_SIN_CONTEXTO = (
-    "Eres Juanito el Inge, el asistente del area de Ingenieria en Diseno. "
-    "Responde de forma clara y amable usando tu conocimiento general sobre ingenieria en diseno. "
-    "No hagas aclaraciones sobre el origen de la informacion ni menciones documentos. "
-    "Evita repetir innecesariamente el nombre del tema que ya quedo establecido en la pregunta. "
-    "Usa negrita (**texto**) para resaltar terminos tecnicos clave."
+_SYSTEM_PROMPT = (
+    "Eres Juanito el Inge, asistente institucional exclusivo del Área de "
+    "Administración, Diseño e Ingeniería (ADE) de la UNEG. "
+    "Tu tono es formal, claro y amable. "
+    "\n\nREGLAS ESTRICTAS:"
+    "\n1. Responde ÚNICAMENTE con información del contexto oficial recuperado. "
+    "No inventes ni añadas contenido externo."
+    "\n2. Cita cada fuente usada en el formato [Fuente: nombre_archivo.ext]."
+    "\n3. Si el contexto incluye documentos ajenos al área ADE (bases de datos, "
+    "medicina, derecho, informática general, etc.), IGNÓRALOS completamente "
+    "y explica que solo puedes usar documentos del área."
+    "\n4. Si la pregunta o los documentos están fuera del alcance ADE y no hay "
+    "contexto oficial suficiente, rechaza la consulta con cortesía institucional."
+    "\n5. Interpreta jerga estudiantil: 'que vaina' → trámite, "
+    "'blueprint' → plano, 'pa pedir un permiso' → procedimiento administrativo."
 )
 
 
@@ -41,37 +42,64 @@ class ChatService:
         user_id: int,
         contexto_extra: str = "",
     ) -> str:
-        fragmentos = await self._vector_store.buscar(texto, self._top_k, self._threshold)
-        hay_contexto = bool(fragmentos or contexto_extra)
+        consulta_ade = texto_es_ade(texto)
+        contexto_validado = ""
+        advertencia_sesion = ""
 
-        prompt = self._construir_prompt(texto, fragmentos, contexto_extra, hay_contexto)
-        respuesta = await self._llm.generar(prompt)
-        await self._logs.guardar(user_id, texto, respuesta, resuelta=hay_contexto)
-        return respuesta
+        if contexto_extra:
+            if texto_es_ade(contexto_extra):
+                contexto_validado = contexto_extra
+            else:
+                advertencia_sesion = (
+                    "\n\n⚠️ Nota: El documento que adjuntaste no parece pertenecer "
+                    "al Área de Administración, Diseño e Ingeniería, por lo que fue ignorado."
+                )
+
+        if not consulta_ade:
+            respuesta = REJECT_MESSAGE + advertencia_sesion
+            await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
+            return respuesta
+
+        fragmentos = await self._vector_store.buscar(texto, self._top_k, self._threshold)
+
+        if not fragmentos and not contexto_validado:
+            respuesta = (
+                "Entiendo tu pregunta dentro del área ADE, pero no tengo documentos oficiales "
+                "del área cargados en este momento. Por favor, carga un documento ADE o usa una "
+                "sesión con fuentes ADE para que pueda responder con información real."
+            )
+            await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
+            return respuesta
+
+        prompt = self._construir_prompt(texto, fragmentos, contexto_validado)
+        try:
+            respuesta = await self._llm.generar(prompt)
+        except Exception as exc:
+            respuesta = (
+                "No pude generar la respuesta en este momento. "
+                "Intenta de nuevo más tarde."
+            )
+            await self._logs.guardar(user_id, texto, str(exc), resuelta=False)
+            return respuesta + advertencia_sesion
+
+        await self._logs.guardar(user_id, texto, respuesta, resuelta=bool(fragmentos or contexto_validado))
+        return respuesta + advertencia_sesion
 
     def _construir_prompt(
         self,
         consulta: str,
         fragmentos: list[str],
         contexto_extra: str = "",
-        hay_contexto: bool = True,
     ) -> str:
-        sistema = _PROMPT_CON_CONTEXTO if hay_contexto else _PROMPT_SIN_CONTEXTO
-        if hay_contexto:
-            partes = []
-            if fragmentos:
-                partes.append("Base de conocimiento:\n" + "\n\n".join(fragmentos))
-            if contexto_extra:
-                partes.append("Documentos de la sesion:\n" + contexto_extra)
-            contexto = "\n\n---\n\n".join(partes)
-            return (
-                f"{sistema}\n\n"
-                f"Contexto:\n{contexto}\n\n"
-                f"Pregunta: {consulta}\n"
-                f"Respuesta:"
-            )
+        partes: list[str] = []
+        if fragmentos:
+            partes.append("Documentos oficiales del área (ChromaDB):\n" + "\n\n".join(fragmentos))
+        if contexto_extra:
+            partes.append("Documentos ADE cargados en la sesión:\n" + contexto_extra)
+        contexto = "\n\n---\n\n".join(partes)
         return (
-            f"{sistema}\n\n"
+            f"{_SYSTEM_PROMPT}\n\n"
+            f"Contexto:\n{contexto}\n\n"
             f"Pregunta: {consulta}\n"
             f"Respuesta:"
         )
