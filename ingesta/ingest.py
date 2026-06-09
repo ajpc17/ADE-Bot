@@ -53,7 +53,7 @@ def ejecutar(docs_path: str | None = None) -> None:
 
     chunk_size = os.getenv("INGEST_CHUNK_SIZE", "2000")
     chunk_overlap = os.getenv("INGEST_CHUNK_OVERLAP", "250")
-    embedding_model = os.getenv("GOOGLE_GENAI_EMBEDDING_MODEL", "gemini-embedding-2-preview")
+    embedding_model = os.getenv("GOOGLE_GENAI_EMBEDDING_MODEL", "gemini-embedding-001")
     print(f"Usando modelo de embedding: {embedding_model}")
     print(f"Usando chunk size: {chunk_size}, overlap: {chunk_overlap}")
 

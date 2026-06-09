@@ -14,6 +14,7 @@ from infrastructure.llm_client import GeminiLLMClient, GroqLLMClient
 from infrastructure.log_repository import SQLiteLogRepository
 from infrastructure.vector_store import ChromaVectorStore
 from services.chat_service import ChatService
+from services.session_store import SessionDocumentStore
 
 load_dotenv()
 
@@ -22,7 +23,7 @@ Path(os.getenv("SQLITE_PATH", "./db/logs.db")).parent.mkdir(parents=True, exist_
 ALLOWED_FILE_EXTENSIONS = {".pdf", ".txt", ".docx", ".png", ".jpg", ".jpeg", ".glb", ".gltf", ".obj"}
 
 _chat_service: ChatService | None = None
-_session_docs: dict[str, dict[str, list[str]]] = {}
+_session_store: SessionDocumentStore | None = None
 
 
 class MensajeRequest(BaseModel):
@@ -45,7 +46,8 @@ def _crear_llm_client() -> GeminiLLMClient | GroqLLMClient:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _chat_service
+    global _chat_service, _session_store
+    _session_store = SessionDocumentStore()
     _chat_service = ChatService(
         vector_store=ChromaVectorStore(
             path=os.getenv("CHROMA_PATH", "./db/chroma"),
@@ -72,12 +74,12 @@ async def index():
 
 @app.post("/api/chat")
 async def chat(request: MensajeRequest):
-    session_docs = _session_docs.get(request.session_id, {})
+    documentos_sesion = await _session_store.list(request.session_id)
     contexto_extra = ""
-    if session_docs:
+    if documentos_sesion:
         partes = [
-            f"[{fname}]\n" + "\n".join(chunks)
-            for fname, chunks in session_docs.items()
+            f"[{doc.filename}]\n" + "\n".join(doc.chunks)
+            for doc in documentos_sesion
         ]
         contexto_extra = "\n\n---\n\n".join(partes)
 
@@ -92,8 +94,8 @@ async def chat(request: MensajeRequest):
 
 @app.get("/api/fuentes")
 async def fuentes(session_id: str = "anonimo"):
-    archivos = list(_session_docs.get(session_id, {}).keys())
-    return {"archivos": archivos}
+    documentos = await _session_store.list(session_id)
+    return {"archivos": [doc.filename for doc in documentos]}
 
 
 @app.post("/api/upload")
@@ -115,17 +117,13 @@ async def upload(archivo: UploadFile = File(...), session_id: str = Form("anonim
         return JSONResponse({"error": "No se pudo extraer texto del archivo."}, status_code=422)
 
     chunks = [doc.page_content for doc in documentos]
-    if session_id not in _session_docs:
-        _session_docs[session_id] = {}
-    _session_docs[session_id][archivo.filename] = chunks
-
+    await _session_store.add(session_id, archivo.filename, chunks, "pdf", {})
     return {"archivo": archivo.filename, "paginas": len(chunks)}
 
 
 @app.delete("/api/upload")
 async def delete_upload(session_id: str, filename: str):
-    if session_id in _session_docs:
-        _session_docs[session_id].pop(filename, None)
+    await _session_store.remove(session_id, filename)
     return {"ok": True}
 
 

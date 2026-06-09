@@ -53,7 +53,3 @@ def texto_es_ade(texto: str) -> bool:
         return False
 
     return is_ade_term(normalized)
-
-
-def texto_contiene_ade(texto: str) -> bool:
-    return texto_es_ade(texto)

@@ -3,6 +3,22 @@ from infrastructure.llm_client import LLMClient
 from infrastructure.log_repository import LogRepository
 from services.ade_dictionary import REJECT_MESSAGE, texto_es_ade
 
+_SALUDOS = {
+    "hola", "buenas", "buenos dias", "buenas tardes", "buenas noches",
+    "hey", "ey", "hi", "hello", "que tal", "como estas", "buen dia",
+}
+
+_META = {
+    "que puedes hacer", "que sabes", "en que me ayudas", "que podria preguntarte",
+    "que puedo preguntarte", "ayudame", "para que sirves", "quien eres",
+    "como funciona", "que eres",
+}
+
+
+def _es_saludo_o_meta(texto: str) -> bool:
+    t = texto.lower().strip().rstrip("?!.")
+    return t in _SALUDOS or any(m in t for m in _META)
+
 _SYSTEM_PROMPT = (
     "Eres Juanito el Inge, asistente institucional exclusivo del Área de "
     "Administración, Diseño e Ingeniería (ADE) de la UNEG. "
@@ -55,7 +71,7 @@ class ChatService:
                     "al Área de Administración, Diseño e Ingeniería, por lo que fue ignorado."
                 )
 
-        if not consulta_ade:
+        if not consulta_ade and not _es_saludo_o_meta(texto):
             respuesta = REJECT_MESSAGE + advertencia_sesion
             await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
             return respuesta

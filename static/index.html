@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADE-Bot | Ingeniería en Diseño</title>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -64,16 +65,16 @@
             height: 64px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 28px;
-            background: var(--navy);
+            background: linear-gradient(180deg, #13263f 0%, #0B1929 100%);
+            box-shadow: 0 1px 0 rgba(59,130,246,0.18), 0 6px 24px rgba(0,0,0,0.4);
             position: relative;
             z-index: 10;
         }
         .hdr::after {
             content: '';
             position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.5) 40%, rgba(240,192,96,0.3) 70%, transparent 100%);
+            background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.75) 38%, rgba(240,192,96,0.45) 68%, transparent 100%);
         }
-        /* CHANGE 1: Header left now just a spacer, logo is centered absolutely */
         .hdr-left { display: flex; align-items: center; gap: 10px; flex: 1; }
         .hdr-pill {
             font-family: 'DM Mono', monospace;
@@ -84,7 +85,6 @@
             border: 1px solid rgba(255,255,255,0.09);
             padding: 4px 10px; border-radius: 100px;
         }
-        /* CHANGE 1: Logo centered via absolute positioning */
         .hdr-logo {
             font-family: 'Poppins', sans-serif;
             font-size: 1.95rem; font-weight: 800;
@@ -102,8 +102,9 @@
         /* ── Sidebar Left ── */
         .sl {
             width: 0; overflow: hidden;
-            background: var(--navy);
-            border-right: 1px solid var(--border-dark);
+            background: linear-gradient(180deg, #13263f 0%, #0B1929 100%);
+            border-right: 1px solid rgba(59,130,246,0.12);
+            box-shadow: 1px 0 0 rgba(59,130,246,0.08), 4px 0 20px rgba(0,0,0,0.3);
             display: flex; flex-direction: column;
             padding: 0; gap: 0; flex-shrink: 0;
             transition: width 0.3s;
@@ -115,8 +116,6 @@
 
         .btn-new {
             display: flex; align-items: center; justify-content: center; gap: 9px;
-            /* CHANGE 2: added margin-top to lower the button slightly */
-            margin-top: 10px;
             padding: 10px; border: none; border-radius: 12px;
             background: var(--accent); color: #fff;
             font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
@@ -131,9 +130,9 @@
         @media (min-width: 1100px) { .btn-new { padding: 10px 14px; } .btn-new .lbl { display: block; } }
 
         .sl-label {
-            font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
-            letter-spacing: 0.18em; text-transform: uppercase;
-            color: rgba(255,255,255,0.22); padding: 0 2px;
+            font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: rgba(255,255,255,0.65); padding: 0 2px;
             display: none;
         }
         @media (min-width: 1100px) { .sl-label { display: block; } }
@@ -146,7 +145,7 @@
             display: flex; align-items: center; gap: 9px;
             padding: 8px 9px; border-radius: 10px;
             cursor: pointer; border: 1px solid transparent;
-            color: rgba(255,255,255,0.45);
+            color: #ffffff;
             transition: background 0.13s, border-color 0.13s, color 0.13s;
         }
         .h-item:hover { background: rgba(255,255,255,0.055); color: rgba(255,255,255,0.85); }
@@ -155,7 +154,8 @@
             border-color: rgba(59,130,246,0.28); color: #fff;
         }
         .h-item .label-conv {
-            font-size: 12.5px; flex: 1; min-width: 0;
+            font-size: 13px; font-family: 'DM Sans', sans-serif;
+            flex: 1; min-width: 0;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             display: none;
         }
@@ -171,6 +171,58 @@
         .h-item .acciones .btn-renombrar:hover { background: rgba(59,130,246,0.22); color: #93C5FD; }
         .h-item .acciones .btn-borrar:hover    { background: rgba(239,68,68,0.18);  color: #FCA5A5; }
 
+        /* Separador */
+        .sl-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59,130,246,0.35) 40%, rgba(240,192,96,0.2) 70%, transparent);
+            flex-shrink: 0; display: none; margin: 2px 0;
+        }
+        @media (min-width: 1100px) { .sl-divider { display: block; } }
+
+        /* Header del listado */
+        .sl-hdr {
+            display: none; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        @media (min-width: 1100px) { .sl-hdr { display: flex; } }
+
+        .sl-count {
+            font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.07);
+            padding: 2px 8px; border-radius: 100px;
+        }
+
+        /* Contenedor del listado con fade inferior */
+        .sl-list-wrap {
+            flex: 1; display: flex; flex-direction: column;
+            overflow: hidden; position: relative; min-height: 0;
+        }
+        .sl-fade {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 36px;
+            background: linear-gradient(to bottom, transparent, var(--navy));
+            pointer-events: none;
+        }
+
+        /* Estado vacío */
+        .sl-empty {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 8px; padding: 28px 8px;
+            color: rgba(255,255,255,0.55); text-align: center; flex-shrink: 0;
+        }
+        .sl-empty span {
+            font-size: 12px; font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.04em; line-height: 1.5; display: none;
+        }
+        @media (min-width: 1100px) { .sl-empty span { display: block; } }
+
+        /* Salida animada al borrar */
+        @keyframes slideOutItem {
+            from { opacity: 1; transform: translateX(0); max-height: 44px; }
+            to   { opacity: 0; transform: translateX(-12px); max-height: 0; padding-top: 0; padding-bottom: 0; margin: 0; }
+        }
+        .h-item-exit { animation: slideOutItem 0.2s ease-in forwards; overflow: hidden; }
+
         /* ── Chat Main ── */
         .chat-main {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
@@ -184,7 +236,6 @@
         }
         @media (min-width: 900px) { #chatArea { padding: 44px 56px 24px; } }
 
-        /* CHANGE 4: Center the welcome section */
         #bienvenida {
             max-width: 540px;
             margin: auto;
@@ -194,16 +245,20 @@
             align-items: center;
         }
         /* Welcome */
+        .w-head { width: fit-content; }
         .w-line {
-            height: 2px; background: linear-gradient(90deg, var(--accent), rgba(59,130,246,0));
-            border-radius: 2px; width: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent 0%, rgba(240,192,96,0.7) 35%, rgba(240,192,96,0.7) 65%, transparent 100%);
+            border-radius: 2px;
+            transform: scaleX(0); transform-origin: center;
+            margin-bottom: 14px;
             animation: wl 1s cubic-bezier(0.4,0,0.2,1) forwards;
         }
-        @keyframes wl { to { width: 52px; } }
+        @keyframes wl { to { transform: scaleX(1); } }
         .w-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.5rem, 2.8vw, 2.2rem); font-weight: 300;
-            color: var(--text-1); line-height: 1.22; margin-top: 18px;
+            font-size: clamp(1.3rem, 2.3vw, 1.9rem); font-weight: 300;
+            color: var(--text-1); line-height: 1.22; margin-top: 18px; white-space: nowrap;
         }
         .w-title b {
             font-weight: 700; color: var(--accent);
@@ -239,7 +294,7 @@
             margin-top: 18px;
         }
         .b-av img {
-            width: 110%; height: 110%;
+            width: 142%; height: 142%;
             object-fit: contain;
             object-position: center center;
             display: block;
@@ -251,8 +306,8 @@
         }
         .b-wrap { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
         .b-name {
-            font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
-            letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+            font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+            letter-spacing: 0.02em; color: var(--accent);
         }
         .b-bbl {
             background: var(--surface-2);
@@ -263,18 +318,22 @@
             box-shadow: var(--sh-sm);
         }
 
-        /* Loading */
-        .typing-wrap { display: flex; flex-direction: column; gap: 7px; }
-        .typing-lbl { font-size: 11px; color: var(--text-3); }
-        .dots { display: flex; gap: 5px; }
-        .dots span {
-            width: 7px; height: 7px; background: var(--accent);
-            border-radius: 50%; opacity: 0.65;
-            animation: bbc 1.2s ease-in-out infinite;
+        /* Skeleton loader */
+        .sk-wrap { display: flex; flex-direction: column; gap: 10px; width: 100%; padding: 2px 0; }
+        .sk-line {
+            height: 13px; border-radius: 7px;
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 300% 100%;
+            animation: sk-shimmer 1.6s ease-in-out infinite;
         }
-        .dots span:nth-child(2) { animation-delay: .18s; }
-        .dots span:nth-child(3) { animation-delay: .36s; }
-        @keyframes bbc { 0%,80%,100%{ transform:translateY(0); } 40%{ transform:translateY(-6px); } }
+        .sk-line:nth-child(1) { width: 92%; }
+        .sk-line:nth-child(2) { width: 78%; }
+        .sk-line:nth-child(3) { width: 85%; }
+        .sk-line:nth-child(4) { width: 55%; }
+        @keyframes sk-shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
 
         /* ── Input ── */
         .inp-zone {
@@ -287,45 +346,45 @@
         .inp-row {
             display: flex; align-items: center;
             background: var(--surface-2);
-            border: 1.5px solid var(--border-md);
-            border-radius: 16px; padding: 5px 5px 5px 6px;
-            box-shadow: var(--sh-md);
+            border: 1.5px solid #CBD5E1;
+            border-radius: 22px; padding: 6px 6px 6px 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.35);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .inp-row:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow), var(--sh-md);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.15), 0 4px 24px rgba(0,0,0,0.35);
         }
         .inp-att {
             width: 36px; height: 36px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
-            border: none; background: transparent; cursor: pointer; border-radius: 9px;
+            border: none; background: transparent; cursor: pointer; border-radius: 50%;
             color: var(--text-3);
             transition: background 0.12s, color 0.12s;
         }
         .inp-att:hover { background: var(--accent-soft); color: var(--accent); }
         #inputMsg {
             flex: 1; border: none; background: transparent; outline: none;
-            font-family: 'DM Sans', sans-serif; font-size: 14px;
+            font-family: 'DM Sans', sans-serif; font-size: 14.5px;
             color: var(--text-1); padding: 10px 12px; min-width: 0;
         }
         #inputMsg::placeholder { color: var(--text-3); }
         #btnEnviar {
             width: 38px; height: 38px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
-            border: none; border-radius: 10px;
-            background: var(--navy); color: #fff;
+            border: none; border-radius: 50%;
+            background: var(--accent); color: #fff;
             cursor: pointer;
-            box-shadow: 0 3px 10px rgba(11,25,41,0.24);
+            box-shadow: 0 3px 12px rgba(59,130,246,0.4);
             transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
         }
-        #btnEnviar:hover  { background: var(--accent); box-shadow: var(--sh-btn); }
+        #btnEnviar:hover  { background: var(--accent-dim); box-shadow: 0 4px 18px rgba(59,130,246,0.55); }
         #btnEnviar:active { transform: scale(0.93); }
         #btnEnviar:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
         .inp-hint {
             display: flex; justify-content: center; align-items: center; gap: 5px;
-            font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3);
-            letter-spacing: 0.07em;
+            font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-3);
+            letter-spacing: 0.04em;
         }
         .inp-hint kbd {
             background: var(--surface-2); border: 1px solid var(--border-md);
@@ -336,32 +395,48 @@
         /* ── Sidebar Right ── */
         .sr {
             width: 268px; flex-shrink: 0;
-            background: var(--surface-2);
-            border-left: 1px solid var(--border-md);
+            background: linear-gradient(180deg, #13263f 0%, #0B1929 100%);
+            border-left: 1px solid rgba(59,130,246,0.12);
+            box-shadow: -1px 0 0 rgba(59,130,246,0.08), -4px 0 20px rgba(0,0,0,0.3);
             display: none; flex-direction: column;
-            padding: 22px 18px; gap: 22px;
+            padding: 22px 18px; gap: 0;
             overflow-y: auto;
         }
         @media (min-width: 1280px) { .sr { display: flex; } }
 
+        .sr section { padding-bottom: 20px; }
+        .sr section:not(:first-child) { padding-top: 20px; }
+
+        .sr-divider {
+            height: 1px; flex-shrink: 0;
+            background: linear-gradient(90deg, transparent, rgba(59,130,246,0.35) 40%, rgba(240,192,96,0.2) 70%, transparent);
+        }
+
         .sr-sec-title {
-            font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
-            letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
-            margin-bottom: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 12px;
+            padding-left: 9px;
+            border-left: 2px solid var(--gold);
         }
 
         /* Docs */
         #estadoVacioFuentes {
-            padding: 16px; border: 1.5px dashed var(--border-md);
+            padding: 16px;
+            border: 1.5px dashed rgba(59,130,246,0.22);
             border-radius: 12px; text-align: center;
+            background: rgba(59,130,246,0.04);
         }
         .src-item {
             display: flex; align-items: center; gap: 8px;
-            padding: 8px 11px; background: var(--surface);
-            border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px;
+            padding: 8px 11px;
+            background: rgba(59,130,246,0.07);
+            border: 1px solid rgba(59,130,246,0.15); border-radius: 10px; margin-bottom: 6px;
         }
         .src-name {
-            font-size: 11.5px; color: var(--text-2); flex: 1; min-width: 0;
+            font-size: 13px; font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.85); flex: 1; min-width: 0;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .src-del {
@@ -370,13 +445,15 @@
             color: var(--text-3); flex-shrink: 0;
             transition: background 0.12s, color 0.12s;
         }
-        .src-del:hover { background: #FEF2F2; color: #EF4444; }
+        .src-del:hover { background: rgba(239,68,68,0.18); color: #FCA5A5; }
 
         /* Render */
         #renderBox {
             width: 100%; height: 192px; border-radius: 14px; overflow: hidden;
-            position: relative; background: var(--surface);
-            border: 1px solid var(--border-md);
+            position: relative;
+            background: linear-gradient(135deg, #0d1f33 0%, #0B1929 100%);
+            border: 1px solid rgba(59,130,246,0.2);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
         }
         #renderPlaceholder {
             position: absolute; inset: 0;
@@ -395,8 +472,8 @@
         }
         .face-3d {
             position: absolute; width: 56px; height: 56px;
-            border: 1px solid rgba(59,130,246,0.38);
-            background: rgba(59,130,246,0.025);
+            border: 1px solid rgba(59,130,246,0.55);
+            background: rgba(59,130,246,0.06);
         }
         .f-front  { transform: rotateY(  0deg) translateZ(28px); }
         .f-back   { transform: rotateY(180deg) translateZ(28px); }
@@ -406,18 +483,20 @@
         .f-bottom { transform: rotateX(-90deg) translateZ(28px); }
 
         .rnd-lbl {
-            font-family: 'DM Mono', monospace; font-size: 10px;
-            letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+            font-family: 'DM Sans', sans-serif; font-size: 12px;
+            letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5);
+            margin-top: 16px;
         }
         #renderSpinner {
             position: absolute; inset: 0;
             display: none; flex-direction: column;
             align-items: center; justify-content: center; gap: 8px;
-            background: var(--surface);
+            background: linear-gradient(135deg, #0d1f33 0%, #0B1929 100%);
         }
         #renderFrame { width: 100%; height: 100%; border: 0; display: none; }
         #renderDesc {
-            font-size: 11.5px; color: var(--text-2); line-height: 1.55;
+            font-size: 13px; font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.75); line-height: 1.6;
             text-align: center; display: none; margin-top: 8px;
         }
 
@@ -426,27 +505,27 @@
         #matDropdownBtn {
             width: 100%; display: flex; align-items: center;
             justify-content: space-between; gap: 8px;
-            padding: 9px 12px; background: var(--surface-2);
-            border: 1px solid var(--border-md); border-radius: 11px;
-            font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-2);
+            padding: 9px 12px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(59,130,246,0.2); border-radius: 11px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8);
             cursor: pointer; box-shadow: var(--sh-sm);
             transition: border-color 0.15s, color 0.15s;
         }
         #matDropdownBtn:hover { border-color: var(--accent); color: var(--accent); }
         #matDropdown {
             display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
-            background: var(--surface-2); border: 1px solid var(--border-md);
+            background: #0f2237; border: 1px solid rgba(59,130,246,0.2);
             border-radius: 12px; box-shadow: var(--sh-lg); z-index: 50; overflow: hidden;
         }
         #matDropdown > div { padding: 5px; max-height: 210px; overflow-y: auto; }
         .mat-option {
             display: block; width: 100%; padding: 8px 11px; text-align: left;
-            font-family: 'DM Sans', sans-serif; font-size: 12.5px;
-            color: var(--text-2); background: transparent; border-radius: 8px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px;
+            color: rgba(255,255,255,0.75); background: transparent; border-radius: 8px;
             transition: background 0.1s, color 0.1s; cursor: pointer; border: none;
         }
-        .mat-option:hover { background: var(--accent-soft); color: var(--accent); }
-        .mat-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+        .mat-option:hover { background: rgba(59,130,246,0.18); color: #93C5FD; }
+        .mat-option.selected { background: rgba(59,130,246,0.22); color: #93C5FD; font-weight: 600; }
 
         /* Material tag in chat */
         .material-tag {
@@ -457,7 +536,12 @@
         .material-tag:hover { color: #1D4ED8; }
 
         /* Tip card */
-        #tipCard { background: var(--navy); border-radius: 16px; padding: 16px; color: #fff; }
+        #tipCard {
+            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(11,25,41,0.7) 100%);
+            border: 1px solid rgba(59,130,246,0.22);
+            border-radius: 16px; padding: 16px; color: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
 
         /* Animations */
         @keyframes floatIn {
@@ -479,6 +563,41 @@
         .tip-anim { animation: fadeInTip 0.4s ease-out forwards; }
 
         @keyframes spinIcon { to { transform: rotate(360deg); } }
+
+        /* Toast deslizante */
+        @keyframes toastSlide {
+            from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Historial: entrada con slide */
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-10px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .h-item-enter { animation: slideInLeft 0.22s ease-out forwards; }
+
+        /* Acciones al hover en mensajes */
+        .msg-actions {
+            display: none; gap: 5px; align-items: center; margin-top: 5px;
+            justify-content: flex-end;
+        }
+        .msg-b:hover .msg-actions,
+        .msg-u:hover .msg-actions { display: flex; }
+        .msg-u .msg-actions { justify-content: flex-end; }
+
+        .msg-time {
+            font-size: 12.5px; color: var(--text-3);
+            font-family: 'DM Sans', sans-serif; letter-spacing: 0.01em;
+        }
+        .btn-copy {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border: none; background: transparent; cursor: pointer;
+            border-radius: 8px; color: var(--text-3);
+            transition: background 0.12s, color 0.12s;
+        }
+        .btn-copy:hover { background: var(--accent-soft); color: var(--accent); }
     </style>
 </head>
 <body>
@@ -498,13 +617,23 @@
 
         
         <aside class="sl no-scroll">
-            
             <button type="button" id="btnNuevoChat" class="btn-new">
                 <i data-lucide="square-pen" style="width:14px;height:14px;flex-shrink:0;"></i>
                 <span class="lbl">Nueva conversación</span>
             </button>
-            <span class="sl-label">Conversaciones</span>
-            <div id="historialChats" class="no-scroll"></div>
+            <div class="sl-divider"></div>
+            <div class="sl-hdr">
+                <span class="sl-label">Conversaciones</span>
+                <span class="sl-count" id="slCount"></span>
+            </div>
+            <div class="sl-list-wrap">
+                <div id="historialChats" class="no-scroll"></div>
+                <div id="slVacio" class="sl-empty">
+                    <i data-lucide="message-square-dashed" style="width:32px;height:32px;color:#3B82F6;"></i>
+                    <span>Aún no hay conversaciones guardadas</span>
+                </div>
+                <div class="sl-fade"></div>
+            </div>
         </aside>
 
         <!-- CHAT -->
@@ -512,8 +641,10 @@
             <div id="chatArea" class="no-scroll">
               
                 <div id="bienvenida" class="card-reveal">
-                    <div class="w-line"></div>
-                    <h2 class="w-title">¿Qué deseas <b>consultar</b> hoy?</h2>
+                    <div class="w-head">
+                        <div class="w-line"></div>
+                        <h2 class="w-title">¿Qué deseas <b>consultar</b> hoy?</h2>
+                    </div>
                     <p class="w-sub">Mis respuestas se sustentan en la documentación oficial del área y en los criterios de diseño aplicados en obras de construcción e ingeniería civil.</p>
                 </div>
             </div>
@@ -542,12 +673,14 @@
                 <p class="sr-sec-title">Documentos</p>
                 <div id="listaFuentes" style="overflow-y:auto;max-height:130px;"></div>
                 <div id="estadoVacioFuentes">
-                    <i data-lucide="file-plus" style="width:20px;height:20px;color:var(--text-3);display:block;margin:0 auto 6px;"></i>
-                    <p style="font-size:11px;color:var(--text-3);line-height:1.5;">
+                    <i data-lucide="file-plus" style="width:20px;height:20px;color:rgba(255,255,255,0.4);display:block;margin:0 auto 6px;"></i>
+                    <p style="font-size:12.5px;font-family:'DM Sans',sans-serif;color:rgba(255,255,255,0.5);line-height:1.55;">
                         Adjunta PDFs con <i data-lucide="paperclip" style="width:11px;height:11px;display:inline;vertical-align:middle;"></i> para esta sesión
                     </p>
                 </div>
             </section>
+
+            <div class="sr-divider"></div>
 
             <!-- Render 3D -->
             <section>
@@ -573,10 +706,10 @@
                 <div class="mat-dw-wrap">
                     <button type="button" id="matDropdownBtn" onclick="toggleMatDropdown()">
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <i data-lucide="layers" style="width:14px;height:14px;color:var(--text-3);flex-shrink:0;"></i>
+                            <i data-lucide="layers" style="width:14px;height:14px;color:rgba(255,255,255,0.45);flex-shrink:0;"></i>
                             <span id="matDropdownLabel">Seleccionar material</span>
                         </div>
-                        <i data-lucide="chevron-down" id="matChevron" style="width:14px;height:14px;color:var(--text-3);transition:transform 0.2s;flex-shrink:0;"></i>
+                        <i data-lucide="chevron-down" id="matChevron" style="width:14px;height:14px;color:rgba(255,255,255,0.45);transition:transform 0.2s;flex-shrink:0;"></i>
                     </button>
                     <div id="matDropdown">
                         <div class="thin-scroll">
@@ -597,6 +730,8 @@
                 </div>
                 <p id="renderDesc"></p>
             </section>
+
+            <div class="sr-divider"></div>
 
             <!-- Sobre el área -->
             <section>
@@ -619,10 +754,11 @@ function esc(t)     { const d=document.createElement('div'); d.appendChild(docum
 
 function toast(txt, ok) {
     const n=document.createElement('div');
-    n.style.cssText=`position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:9999;
+    n.style.cssText=`position:fixed;bottom:145px;left:50%;transform:translateX(-50%);z-index:9999;
         padding:11px 18px;border-radius:12px;font-size:13px;font-family:'DM Sans',sans-serif;
         font-weight:500;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.18);
-        background:${ok?'#15803D':'#DC2626'};`;
+        animation:toastSlide 0.28s ease-out forwards;
+        background:${ok?'#2563EB':'#DC2626'};`;
     n.textContent=txt; document.body.appendChild(n);
     setTimeout(()=>n.remove(),3200);
 }
@@ -714,13 +850,13 @@ function renderTip(i){
         <div class="tip-anim" style="display:flex;flex-direction:column;gap:11px;">
             <div style="display:flex;align-items:center;gap:7px;">
                 <i data-lucide="zap" style="width:12px;height:12px;color:#93C5FD;flex-shrink:0;"></i>
-                <span style="font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;color:#93C5FD;">${t.titulo}</span>
+                <span style="font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:600;color:#93C5FD;">${t.titulo}</span>
             </div>
-            <p style="font-size:11.5px;line-height:1.62;color:rgba(255,255,255,0.6);">${t.texto}</p>
+            <p style="font-size:13px;font-family:'DM Sans',sans-serif;line-height:1.68;color:rgba(255,255,255,0.7);">${t.texto}</p>
             <button onclick="preguntarSobreTip()"
                 style="display:flex;align-items:center;justify-content:center;gap:6px;
-                padding:8px 12px;background:rgba(59,130,246,0.22);border:1px solid rgba(59,130,246,0.32);
-                border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+                padding:9px 12px;background:rgba(59,130,246,0.22);border:1px solid rgba(59,130,246,0.32);
+                border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
                 color:#93C5FD;cursor:pointer;width:100%;transition:background 0.15s;"
                 onmouseover="this.style.background='rgba(59,130,246,0.38)'"
                 onmouseout="this.style.background='rgba(59,130,246,0.22)'">
@@ -737,9 +873,20 @@ setInterval(()=>{ tipIndex=(tipIndex+1)%TIPS.length; renderTip(tipIndex); },3000
 /* ── New chat / history ── */
 document.getElementById('btnNuevoChat').addEventListener('click', crearNuevoChat);
 
-const BIENVENIDA_HTML=`<div id="bienvenida" class="card-reveal"><div class="w-line"></div>
-    <h2 class="w-title">¿Qué deseas <b>consultar</b> hoy?</h2>
-    <p class="w-sub">Mis respuestas se sustentan en la documentación oficial del área y en los criterios de diseño aplicados en obras de construcción e ingeniería civil.</p></div>`;
+const _VARIANTES_BIENVENIDA=[
+    {titulo:'¿Qué deseas <b>consultar</b> hoy?',        sub:'Mis respuestas se sustentan en la documentación oficial del área y en los criterios de diseño aplicados en obras de construcción e ingeniería civil.'},
+    {titulo:'¿En qué puedo <b>ayudarte</b> hoy?',       sub:'Cuéntame tu duda y la responderé con base en los documentos oficiales del área ADE.'},
+    {titulo:'¿Qué necesitas <b>saber</b> del área?',    sub:'Pregunta sobre trámites, normativas, materias o cualquier proceso relacionado con ingeniería en diseño.'},
+    {titulo:'¿Tienes alguna <b>duda</b> sobre ADE?',    sub:'Tengo acceso a la documentación oficial del área. Estoy listo para orientarte.'},
+    {titulo:'¿Qué quieres <b>resolver</b> hoy?',        sub:'Puedo guiarte sobre procesos, reglamentos y documentación del área de Administración, Diseño e Ingeniería.'},
+    {titulo:'¿Hay algo en lo que <b>ayudarte</b>?',     sub:'Mis respuestas se basan en fuentes reales del área. No dudes en preguntar lo que necesites.'},
+    {titulo:'¿Qué puedo <b>explicarte</b> del área?',   sub:'Desde trámites hasta normativas técnicas, estoy aquí para ayudarte con información del área ADE.'},
+];
+function generarBienvenida(){
+    const v=_VARIANTES_BIENVENIDA[Math.floor(Math.random()*_VARIANTES_BIENVENIDA.length)];
+    return `<div id="bienvenida" class="card-reveal"><div class="w-head"><div class="w-line"></div><h2 class="w-title">${v.titulo}</h2></div><p class="w-sub">${v.sub}</p></div>`;
+}
+(()=>{ const bv=document.getElementById('bienvenida'); if(bv) bv.outerHTML=generarBienvenida(); })();
 
 function guardarYArchivar(){
     if(!totalConsultas) return;
@@ -751,7 +898,7 @@ function crearNuevoChat(){
     guardarYArchivar();
     SESSION_ID=genId(); sesionPreview=''; totalConsultas=0; mensajesActuales=[];
     btnEnviar.disabled=false; renderFuentes([]); marcarActivo(null);
-    chatArea.innerHTML=BIENVENIDA_HTML; inputMsg.focus();
+    chatArea.innerHTML=generarBienvenida(); inputMsg.focus();
 }
 function cargarConversacion(sid){
     const c=conversaciones[sid]; if(!c) return;
@@ -771,7 +918,7 @@ function marcarActivo(sid){
 }
 function agregarAlHistorial(preview,sid){
     const h=document.getElementById('historialChats');
-    const d=document.createElement('div'); d.className='h-item'; d.dataset.sid=sid;
+    const d=document.createElement('div'); d.className='h-item h-item-enter'; d.dataset.sid=sid;
     d.innerHTML=`<i data-lucide="message-square" style="width:13px;height:13px;flex-shrink:0;opacity:0.55;"></i>
         <span class="label-conv" title="${esc(preview)}">${esc(preview.slice(0,22))}</span>
         <div class="acciones">
@@ -781,9 +928,21 @@ function agregarAlHistorial(preview,sid){
     d.addEventListener('click',()=>cargarConversacion(sid));
     d.querySelector('.btn-borrar').addEventListener('click',e=>{e.stopPropagation();borrarConversacion(sid,d);});
     d.querySelector('.btn-renombrar').addEventListener('click',e=>{e.stopPropagation();renombrarConversacion(sid,d);});
-    h.insertBefore(d,h.firstChild); lucide.createIcons();
+    h.insertBefore(d,h.firstChild); lucide.createIcons(); actualizarConteo();
 }
-function borrarConversacion(sid,el){ delete conversaciones[sid]; enHistorial.delete(sid); el.remove(); }
+function actualizarConteo(){
+    const n=enHistorial.size;
+    const badge=document.getElementById('slCount');
+    const vacio=document.getElementById('slVacio');
+    if(badge) badge.textContent=n>0?n:'';
+    if(vacio) vacio.style.display=n===0?'flex':'none';
+}
+
+function borrarConversacion(sid,el){
+    delete conversaciones[sid]; enHistorial.delete(sid);
+    el.classList.add('h-item-exit');
+    setTimeout(()=>{ el.remove(); actualizarConteo(); },200);
+}
 function renombrarConversacion(sid,el){
     const lbl=el.querySelector('.label-conv');
     const prev=conversaciones[sid]?.preview||lbl.textContent.trim();
@@ -900,11 +1059,17 @@ function verMaterial3D(key){
 }
 
 /* ── Chat rendering ── */
+function horaActual(){ return new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}); }
+
 function renderMensaje(tipo, txt, anim=true){
     const div=document.createElement('div');
     if(tipo==='usuario'){
         div.className=(anim?'card-reveal ':'')+'msg-u';
-        div.innerHTML=`<div class="bbl-u">${esc(txt)}</div>`;
+        div.innerHTML=`
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+                <div class="bbl-u">${esc(txt)}</div>
+                <div class="msg-actions"><span class="msg-time">${anim?horaActual():''}</span></div>
+            </div>`;
     } else {
         div.className=(anim?'card-reveal ':'')+'msg-b';
         div.innerHTML=`
@@ -915,17 +1080,65 @@ function renderMensaje(tipo, txt, anim=true){
             <div class="b-wrap">
                 <span class="b-name">Juanito el Inge</span>
                 <div class="b-bbl"><span style="white-space:pre-wrap;">${procesarTextoBot(txt)}</span></div>
+                <div class="msg-actions">
+                    ${anim?`<span class="msg-time">${horaActual()}</span>`:''}
+                    <button type="button" class="btn-copy" title="Copiar respuesta" onclick="copiarMensaje(this)">
+                        <i data-lucide="copy" style="width:15px;height:15px;"></i>
+                    </button>
+                </div>
             </div>`;
+        lucide.createIcons();
     }
     chatArea.appendChild(div);
-    if(tipo==='bot'){
-        const top=div.getBoundingClientRect().top-chatArea.getBoundingClientRect().top+chatArea.scrollTop-16;
-        chatArea.scrollTo({top:Math.max(0,top),behavior:'smooth'});
-    } else { chatArea.scrollTop=chatArea.scrollHeight; }
+    chatArea.scrollTo({top:chatArea.scrollHeight,behavior:'smooth'});
 }
 
-function agregarMensajeUsuario(t){ mensajesActuales.push({tipo:'usuario',texto:t}); renderMensaje('usuario',t,true); }
-function agregarMensajeBot(t)    { mensajesActuales.push({tipo:'bot',texto:t});     renderMensaje('bot',t,true); }
+function copiarMensaje(btn){
+    const txt=btn.closest('.b-wrap').querySelector('.b-bbl').textContent.trim();
+    navigator.clipboard.writeText(txt).then(()=>toast('Respuesta copiada',true));
+}
+
+function agregarMensajeUsuario(t){
+    mensajesActuales.push({tipo:'usuario',texto:t});
+    renderMensaje('usuario',t,true);
+}
+
+async function agregarMensajeBot(txt){
+    mensajesActuales.push({tipo:'bot',texto:txt});
+    const time=horaActual();
+    const div=document.createElement('div');
+    div.className='card-reveal msg-b';
+    div.innerHTML=`
+        <div class="b-av">
+            <img src="/static/icon.png" alt="Juanito" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="b-av-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">J</div>
+        </div>
+        <div class="b-wrap">
+            <span class="b-name">Juanito el Inge</span>
+            <div class="b-bbl"><span class="tw-text" style="white-space:pre-wrap;"></span></div>
+            <div class="msg-actions">
+                <span class="msg-time">${time}</span>
+                <button type="button" class="btn-copy" title="Copiar respuesta" onclick="copiarMensaje(this)">
+                    <i data-lucide="copy" style="width:15px;height:15px;"></i>
+                </button>
+            </div>
+        </div>`;
+    chatArea.appendChild(div);
+    lucide.createIcons();
+
+    const twEl=div.querySelector('.tw-text');
+    const words=txt.split(' ');
+    let built='';
+    for(let i=0;i<words.length;i++){
+        built+=(i>0?' ':'')+words[i];
+        twEl.textContent=built;
+        chatArea.scrollTo({top:chatArea.scrollHeight,behavior:'smooth'});
+        await new Promise(r=>setTimeout(r,28));
+    }
+    twEl.innerHTML=procesarTextoBot(txt);
+    lucide.createIcons();
+    chatArea.scrollTo({top:chatArea.scrollHeight,behavior:'smooth'});
+}
 
 function mostrarCargando(){
     const div=document.createElement('div'); div.id='cargando'; div.className='msg-b';
@@ -937,9 +1150,11 @@ function mostrarCargando(){
         <div class="b-wrap">
             <span class="b-name">Juanito el Inge</span>
             <div class="b-bbl">
-                <div class="typing-wrap">
-                    <span class="typing-lbl">Procesando consulta…</span>
-                    <div class="dots"><span></span><span></span><span></span></div>
+                <div class="sk-wrap">
+                    <div class="sk-line"></div>
+                    <div class="sk-line"></div>
+                    <div class="sk-line"></div>
+                    <div class="sk-line"></div>
                 </div>
             </div>
         </div>`;
@@ -966,6 +1181,7 @@ btnEnviar.addEventListener('click', enviar);
 inputMsg.addEventListener('keydown', e=>{ if(e.key==='Enter') enviar(); });
 inputMsg.focus();
 cargarFuentes();
+actualizarConteo();
 </script>
 </body>
 </html>

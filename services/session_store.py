@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 SESSION_STORE_PATH = Path(os.getenv("SESSION_STORE_PATH", "./db/sessions"))
-SESSION_STORE_PATH.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass
@@ -24,6 +23,7 @@ class SessionDocument:
 class SessionDocumentStore:
     def __init__(self) -> None:
         self._storage_dir = SESSION_STORE_PATH
+        self._storage_dir.mkdir(parents=True, exist_ok=True)
 
     def _session_file(self, session_id: str) -> Path:
         safe_id = session_id.replace("/", "_").replace("\\", "_")
