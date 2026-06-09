@@ -54,6 +54,7 @@ ADE_CATEGORIES = {
     "area": (
         "ade", "administración", "administracion", "ingeniería", "ingenieria", "diseño", "diseno",
         "uneg", "universidad", "carrera", "pensum", "materia", "asignatura", "semestre",
+        "area", "información", "informacion",
     ),
     "process": (
         "trámite", "tramite", "proceso", "solicitud", "permiso", "autorización", "autorizacion",

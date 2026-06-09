@@ -4,7 +4,6 @@ from infrastructure.log_repository import LogRepository
 from services.ade_dictionary import REJECT_MESSAGE, texto_es_ade
 
 _SYSTEM_PROMPT = (
-<<<<<<< HEAD
     "Eres Juanito el Inge, asistente institucional exclusivo del Área de "
     "Administración, Diseño e Ingeniería (ADE) de la UNEG. "
     "Tu tono es formal, claro y amable. "
@@ -19,16 +18,6 @@ _SYSTEM_PROMPT = (
     "contexto oficial suficiente, rechaza la consulta con cortesía institucional."
     "\n5. Interpreta jerga estudiantil: 'que vaina' → trámite, "
     "'blueprint' → plano, 'pa pedir un permiso' → procedimiento administrativo."
-=======
-    "Eres Juanito el Inge, asistente institucional del Área de Ingeniería en Diseño. "
-    "Tu tono debe ser formal, claro, amable e institucional. "
-    "Responde únicamente con información respaldada por los documentos oficiales recuperados. "
-    "Si usas información recuperada, cita cada fuente explícitamente en el formato [Fuente: nombre_documento.ext]. "
-    "Si empleas varias fuentes, menciona todas las fuentes utilizadas. "
-    "No agregues contenido que no esté presente en el contexto proporcionado. "
-    "Interpreta correctamente la jerga estudiantil, por ejemplo: 'que vaina' puede referirse a un trámite, 'blueprint' a un plano, 'pa pedir un permiso' a un procedimiento administrativo. "
-    "Si la pregunta está fuera del alcance del Área de Ingeniería en Diseño o no hay contenido recuperado suficiente, rechaza la consulta de forma protocolar y amable."
->>>>>>> upstream/master
 )
 
 
@@ -53,7 +42,6 @@ class ChatService:
         user_id: int,
         contexto_extra: str = "",
     ) -> str:
-<<<<<<< HEAD
         consulta_ade = texto_es_ade(texto)
         contexto_validado = ""
         advertencia_sesion = ""
@@ -67,8 +55,8 @@ class ChatService:
                     "al Área de Administración, Diseño e Ingeniería, por lo que fue ignorado."
                 )
 
-       # if not consulta_ade:
-#     respuesta = REJECT_MESSAGE + advertencia_sesion
+        if not consulta_ade:
+            respuesta = REJECT_MESSAGE + advertencia_sesion
             await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
             return respuesta
 
@@ -96,25 +84,6 @@ class ChatService:
 
         await self._logs.guardar(user_id, texto, respuesta, resuelta=bool(fragmentos or contexto_validado))
         return respuesta + advertencia_sesion
-=======
-        print(f"[DEBUG] ChatService.procesar_consulta texto={texto!r} top_k={self._top_k} threshold={self._threshold}")
-        # Forzamos threshold a 0.0 para ignorar el filtro matemático defectuoso
-        fragmentos = await self._vector_store.buscar(texto, self._top_k, 0.0) 
-        print(f"[DEBUG] ChatService received {len(fragmentos)} fragmentos")
-        if not fragmentos and not contexto_extra:
-            respuesta = (
-                "Lo siento, soy Juanito el Inge y no puedo responder esa consulta porque no corresponde al área de Ingeniería en Diseño "
-                "o no se obtuvo información suficiente de los documentos oficiales disponibles. "
-                "Por favor, formula una pregunta específica relacionada con trámites, planos, materiales o normas del área."
-            )
-            await self._logs.guardar(user_id, texto, respuesta, resuelta=False)
-            return respuesta
-
-        prompt = self._construir_prompt(texto, fragmentos, contexto_extra)
-        respuesta = await self._llm.generar(prompt)
-        await self._logs.guardar(user_id, texto, respuesta, resuelta=bool(fragmentos or contexto_extra))
-        return respuesta
->>>>>>> upstream/master
 
     def _construir_prompt(
         self,
@@ -122,19 +91,11 @@ class ChatService:
         fragmentos: list[str],
         contexto_extra: str = "",
     ) -> str:
-<<<<<<< HEAD
         partes: list[str] = []
         if fragmentos:
             partes.append("Documentos oficiales del área (ChromaDB):\n" + "\n\n".join(fragmentos))
         if contexto_extra:
             partes.append("Documentos ADE cargados en la sesión:\n" + contexto_extra)
-=======
-        partes = []
-        if fragmentos:
-            partes.append("Documentos oficiales recuperados:\n" + "\n\n".join(fragmentos))
-        if contexto_extra:
-            partes.append("Documentos cargados en la sesión:\n" + contexto_extra)
->>>>>>> upstream/master
         contexto = "\n\n---\n\n".join(partes)
         return (
             f"{_SYSTEM_PROMPT}\n\n"

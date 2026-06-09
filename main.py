@@ -19,15 +19,19 @@ load_dotenv()
 
 Path(os.getenv("SQLITE_PATH", "./db/logs.db")).parent.mkdir(parents=True, exist_ok=True)
 
-_chat_service: ChatService | None = None
+ALLOWED_FILE_EXTENSIONS = {".pdf", ".txt", ".docx", ".png", ".jpg", ".jpeg", ".glb", ".gltf", ".obj"}
 
-# Documentos por sesion: {session_id: {filename: [paginas_texto]}}
+_chat_service: ChatService | None = None
 _session_docs: dict[str, dict[str, list[str]]] = {}
+
+
+class MensajeRequest(BaseModel):
+    mensaje: str
+    session_id: str = "anonimo"
 
 
 def _crear_llm_client() -> GeminiLLMClient | GroqLLMClient:
     groq_key = os.getenv("GROQ_API_KEY")
-    gemini_key = os.getenv("GEMINI_API_KEY")
     if groq_key:
         return GroqLLMClient(
             api_key=groq_key,
@@ -39,21 +43,17 @@ def _crear_llm_client() -> GeminiLLMClient | GroqLLMClient:
     )
 
 
-def _obtener_chroma_api_key() -> str:
-    return os.getenv("CHROMA_API_KEY") or os.getenv("GEMINI_API_KEY") or ""
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _chat_service
     _chat_service = ChatService(
         vector_store=ChromaVectorStore(
-            path=os.getenv("CHROMA_PATH"),
-            api_key=os.getenv("GEMINI_API_KEY"),  # los embeddings siempre usan Google aunque el LLM sea Groq
+            path=os.getenv("CHROMA_PATH", "./db/chroma"),
+            api_key=os.getenv("GEMINI_API_KEY", ""),
         ),
         llm_client=_crear_llm_client(),
         log_repository=SQLiteLogRepository(
-            path=os.getenv("SQLITE_PATH"),
+            path=os.getenv("SQLITE_PATH", "./db/logs.db"),
         ),
         top_k=int(os.getenv("TOP_K", 4)),
         similarity_threshold=float(os.getenv("SIMILARITY_THRESHOLD", 0.60)),
@@ -106,11 +106,15 @@ async def upload(archivo: UploadFile = File(...), session_id: str = Form("anonim
         )
 
     contenido = await archivo.read()
-    chunks = _extraer_texto_pdf(contenido)
+    try:
+        documentos = cargar_documento_desde_bytes(archivo.filename, contenido)
+    except Exception:
+        documentos = []
 
-    if not chunks:
-        return JSONResponse({"error": "No se pudo extraer texto del PDF."}, status_code=422)
+    if not documentos:
+        return JSONResponse({"error": "No se pudo extraer texto del archivo."}, status_code=422)
 
+    chunks = [doc.page_content for doc in documentos]
     if session_id not in _session_docs:
         _session_docs[session_id] = {}
     _session_docs[session_id][archivo.filename] = chunks
@@ -120,7 +124,8 @@ async def upload(archivo: UploadFile = File(...), session_id: str = Form("anonim
 
 @app.delete("/api/upload")
 async def delete_upload(session_id: str, filename: str):
-    await session_store.remove(session_id, filename)
+    if session_id in _session_docs:
+        _session_docs[session_id].pop(filename, None)
     return {"ok": True}
 
 
