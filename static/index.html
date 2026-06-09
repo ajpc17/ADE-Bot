@@ -1,56 +1,391 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADE-Bot | Ingeniería en Diseño</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Fira+Code:wght@400;500&family=Exo+2:ital,wght@0,800;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        :root { --accent: #3b82f6; --surface: rgba(255,255,255,0.97); }
+        :root {
+            --navy:        #0B1929;
+            --navy-mid:    #132236;
+            --navy-light:  #1B3050;
+            --accent:      #3B82F6;
+            --accent-dim:  #2563EB;
+            --accent-soft: #EFF6FF;
+            --accent-glow: rgba(59,130,246,0.2);
+            --surface:     #F4F7FB;
+            --surface-2:   #FFFFFF;
+            --border:      rgba(15,35,60,0.07);
+            --border-md:   rgba(15,35,60,0.12);
+            --border-dark: rgba(255,255,255,0.07);
+            --text-1:      #0B1929;
+            --text-2:      #475569;
+            --text-3:      #94A3B8;
+            --gold:        #F0C060;
+            --sh-sm:       0 1px 4px rgba(11,25,41,0.05);
+            --sh-md:       0 4px 20px rgba(11,25,41,0.08);
+            --sh-lg:       0 16px 56px rgba(11,25,41,0.12);
+            --sh-btn:      0 4px 14px rgba(59,130,246,0.38);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Outfit', sans-serif;
-            background: #f0f2f5;
-            background-image:
-                radial-gradient(at 0% 0%,    rgba(59,130,246,0.05) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(59,130,246,0.1)  0px, transparent 50%);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            height: 100vh; overflow: hidden; color: var(--text-1);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ── Scrollbars ── */
+        .thin-scroll::-webkit-scrollbar { width: 3px; }
+        .thin-scroll::-webkit-scrollbar-track { background: transparent; }
+        .thin-scroll::-webkit-scrollbar-thumb { background: rgba(15,35,60,0.1); border-radius: 4px; }
+        .no-scroll::-webkit-scrollbar { display: none; }
+        .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── Shell ── */
+        .app {
+            width: 100%; max-width: 1440px;
             height: 100vh;
+            display: flex; flex-direction: column;
+            background: var(--surface-2);
             overflow: hidden;
         }
-        .glass {
-            background: var(--surface);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+        @media (min-width: 900px) {
+            body { padding: 18px; }
+            .app { height: calc(100vh - 36px); border-radius: 24px; box-shadow: var(--sh-lg); }
         }
-        .mono { font-family: 'Fira Code', monospace; }
 
-        @keyframes drawLine {
-            from { width: 0; opacity: 0; }
-            to   { width: 100%; opacity: 1; }
-        }
-        .animate-draw { animation: drawLine 1s cubic-bezier(0.4,0,0.2,1) forwards; }
-
-        @keyframes floatIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .card-reveal { animation: floatIn 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0) scale(1); }
-            to   { opacity: 0; transform: translateY(-12px) scale(0.97); }
-        }
-        .fade-out { animation: fadeOut 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
-
-        /* Cubo 3D placeholder en el visor de materiales */
-        .scene { width: 64px; height: 64px; perspective: 180px; }
-        .cube-3d {
-            width: 100%; height: 100%;
+        /* ── Header ── */
+        .hdr {
+            height: 64px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px;
+            background: var(--navy);
             position: relative;
+            z-index: 10;
+        }
+        .hdr::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.5) 40%, rgba(240,192,96,0.3) 70%, transparent 100%);
+        }
+        /* CHANGE 1: Header left now just a spacer, logo is centered absolutely */
+        .hdr-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .hdr-pill {
+            font-family: 'DM Mono', monospace;
+            font-size: 9.5px; font-weight: 500;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            padding: 4px 10px; border-radius: 100px;
+        }
+        /* CHANGE 1: Logo centered via absolute positioning */
+        .hdr-logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.95rem; font-weight: 800;
+            letter-spacing: -0.04em; color: #fff;
+            display: flex; align-items: baseline; gap: 3px;
+            user-select: none;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+        .hdr-logo .b { color: var(--accent); font-style: italic; font-weight: 700; }
+        .hdr-logo .dot { color: var(--gold); font-size: 1.1rem; margin-left: 1px; }
+
+        /* ── Body ── */
+        .body { display: flex; flex: 1; overflow: hidden; }
+
+        /* ── Sidebar Left ── */
+        .sl {
+            width: 0; overflow: hidden;
+            background: var(--navy);
+            border-right: 1px solid var(--border-dark);
+            display: flex; flex-direction: column;
+            padding: 0; gap: 0; flex-shrink: 0;
+            transition: width 0.3s;
+        }
+        @media (min-width: 768px) {
+            .sl { width: 60px; padding: 16px 10px; gap: 12px; display: flex; }
+        }
+        @media (min-width: 1100px) { .sl { width: 228px; padding: 20px 14px; gap: 14px; } }
+
+        .btn-new {
+            display: flex; align-items: center; justify-content: center; gap: 9px;
+            /* CHANGE 2: added margin-top to lower the button slightly */
+            margin-top: 10px;
+            padding: 10px; border: none; border-radius: 12px;
+            background: var(--accent); color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+            cursor: pointer; flex-shrink: 0;
+            box-shadow: var(--sh-btn);
+            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+            white-space: nowrap; overflow: hidden;
+        }
+        .btn-new:hover { background: var(--accent-dim); box-shadow: 0 6px 22px rgba(59,130,246,0.48); }
+        .btn-new:active { transform: scale(0.96); }
+        .btn-new .lbl { display: none; }
+        @media (min-width: 1100px) { .btn-new { padding: 10px 14px; } .btn-new .lbl { display: block; } }
+
+        .sl-label {
+            font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: rgba(255,255,255,0.22); padding: 0 2px;
+            display: none;
+        }
+        @media (min-width: 1100px) { .sl-label { display: block; } }
+
+        #historialChats {
+            flex: 1; overflow-y: auto; display: flex;
+            flex-direction: column; gap: 3px;
+        }
+        .h-item {
+            display: flex; align-items: center; gap: 9px;
+            padding: 8px 9px; border-radius: 10px;
+            cursor: pointer; border: 1px solid transparent;
+            color: rgba(255,255,255,0.45);
+            transition: background 0.13s, border-color 0.13s, color 0.13s;
+        }
+        .h-item:hover { background: rgba(255,255,255,0.055); color: rgba(255,255,255,0.85); }
+        .h-item.hi-active {
+            background: rgba(59,130,246,0.15);
+            border-color: rgba(59,130,246,0.28); color: #fff;
+        }
+        .h-item .label-conv {
+            font-size: 12.5px; flex: 1; min-width: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: none;
+        }
+        @media (min-width: 1100px) { .h-item .label-conv { display: block; } }
+        .h-item .acciones { display: none; gap: 2px; }
+        @media (min-width: 1100px) { .h-item:hover .acciones { display: flex; } }
+        .h-item .acciones button {
+            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; border: none; background: transparent; cursor: pointer;
+            color: rgba(255,255,255,0.35);
+            transition: background 0.12s, color 0.12s;
+        }
+        .h-item .acciones .btn-renombrar:hover { background: rgba(59,130,246,0.22); color: #93C5FD; }
+        .h-item .acciones .btn-borrar:hover    { background: rgba(239,68,68,0.18);  color: #FCA5A5; }
+
+        /* ── Chat Main ── */
+        .chat-main {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--surface);
+        }
+
+        #chatArea {
+            flex: 1; overflow-y: auto;
+            padding: 36px 32px 20px;
+            display: flex; flex-direction: column; gap: 24px;
+        }
+        @media (min-width: 900px) { #chatArea { padding: 44px 56px 24px; } }
+
+        /* CHANGE 4: Center the welcome section */
+        #bienvenida {
+            max-width: 540px;
+            margin: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* Welcome */
+        .w-line {
+            height: 2px; background: linear-gradient(90deg, var(--accent), rgba(59,130,246,0));
+            border-radius: 2px; width: 0;
+            animation: wl 1s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        @keyframes wl { to { width: 52px; } }
+        .w-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.5rem, 2.8vw, 2.2rem); font-weight: 300;
+            color: var(--text-1); line-height: 1.22; margin-top: 18px;
+        }
+        .w-title b {
+            font-weight: 700; color: var(--accent);
+            text-decoration: underline; text-decoration-color: rgba(59,130,246,0.25);
+            text-underline-offset: 5px; text-decoration-thickness: 2.5px;
+        }
+        .w-sub {
+            font-size: 15px; color: var(--text-2); margin-top: 10px;
+            font-weight: 300; line-height: 1.65;
+        }
+
+       
+        .msg-u { display: flex; justify-content: flex-end; }
+        .bbl-u {
+            background: var(--navy); color: #fff;
+            padding: 13px 18px; border-radius: 18px 18px 3px 18px;
+            max-width: 520px; font-size: 14px; line-height: 1.65;
+            box-shadow: 0 4px 18px rgba(11,25,41,0.22);
+        }
+
+        
+        .msg-b { display: flex; align-items: flex-start; gap: 12px; max-width: 780px; }
+        .b-av {
+            width: 100px; height: 100px; flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--border-md);
+            overflow: hidden;
+            box-shadow: var(--sh-sm);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            z-index: 2;
+            margin-top: 18px;
+        }
+        .b-av img {
+            width: 110%; height: 110%;
+            object-fit: contain;
+            object-position: center center;
+            display: block;
+        }
+        .b-av-fallback {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700; font-size: 14px;
+            color: var(--accent); letter-spacing: -0.5px;
+        }
+        .b-wrap { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+        .b-name {
+            font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+        }
+        .b-bbl {
+            background: var(--surface-2);
+            border: 1px solid var(--border-md);
+            border-radius: 18px;
+            padding: 15px 18px;
+            font-size: 14px; line-height: 1.72; color: var(--text-1);
+            box-shadow: var(--sh-sm);
+        }
+
+        /* Loading */
+        .typing-wrap { display: flex; flex-direction: column; gap: 7px; }
+        .typing-lbl { font-size: 11px; color: var(--text-3); }
+        .dots { display: flex; gap: 5px; }
+        .dots span {
+            width: 7px; height: 7px; background: var(--accent);
+            border-radius: 50%; opacity: 0.65;
+            animation: bbc 1.2s ease-in-out infinite;
+        }
+        .dots span:nth-child(2) { animation-delay: .18s; }
+        .dots span:nth-child(3) { animation-delay: .36s; }
+        @keyframes bbc { 0%,80%,100%{ transform:translateY(0); } 40%{ transform:translateY(-6px); } }
+
+        /* ── Input ── */
+        .inp-zone {
+            padding: 14px 32px 20px;
+            background: linear-gradient(to top, var(--surface) 75%, transparent);
+            flex-shrink: 0;
+        }
+        @media (min-width: 900px) { .inp-zone { padding: 14px 56px 22px; } }
+        .inp-wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 9px; }
+        .inp-row {
+            display: flex; align-items: center;
+            background: var(--surface-2);
+            border: 1.5px solid var(--border-md);
+            border-radius: 16px; padding: 5px 5px 5px 6px;
+            box-shadow: var(--sh-md);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .inp-row:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow), var(--sh-md);
+        }
+        .inp-att {
+            width: 36px; height: 36px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border: none; background: transparent; cursor: pointer; border-radius: 9px;
+            color: var(--text-3);
+            transition: background 0.12s, color 0.12s;
+        }
+        .inp-att:hover { background: var(--accent-soft); color: var(--accent); }
+        #inputMsg {
+            flex: 1; border: none; background: transparent; outline: none;
+            font-family: 'DM Sans', sans-serif; font-size: 14px;
+            color: var(--text-1); padding: 10px 12px; min-width: 0;
+        }
+        #inputMsg::placeholder { color: var(--text-3); }
+        #btnEnviar {
+            width: 38px; height: 38px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            border: none; border-radius: 10px;
+            background: var(--navy); color: #fff;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(11,25,41,0.24);
+            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+        }
+        #btnEnviar:hover  { background: var(--accent); box-shadow: var(--sh-btn); }
+        #btnEnviar:active { transform: scale(0.93); }
+        #btnEnviar:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+        .inp-hint {
+            display: flex; justify-content: center; align-items: center; gap: 5px;
+            font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3);
+            letter-spacing: 0.07em;
+        }
+        .inp-hint kbd {
+            background: var(--surface-2); border: 1px solid var(--border-md);
+            border-radius: 5px; padding: 2px 7px;
+            font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-2);
+        }
+
+        /* ── Sidebar Right ── */
+        .sr {
+            width: 268px; flex-shrink: 0;
+            background: var(--surface-2);
+            border-left: 1px solid var(--border-md);
+            display: none; flex-direction: column;
+            padding: 22px 18px; gap: 22px;
+            overflow-y: auto;
+        }
+        @media (min-width: 1280px) { .sr { display: flex; } }
+
+        .sr-sec-title {
+            font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+            letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3);
+            margin-bottom: 10px;
+        }
+
+        /* Docs */
+        #estadoVacioFuentes {
+            padding: 16px; border: 1.5px dashed var(--border-md);
+            border-radius: 12px; text-align: center;
+        }
+        .src-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 11px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 10px; margin-bottom: 6px;
+        }
+        .src-name {
+            font-size: 11.5px; color: var(--text-2); flex: 1; min-width: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .src-del {
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+            border: none; background: transparent; cursor: pointer; border-radius: 5px;
+            color: var(--text-3); flex-shrink: 0;
+            transition: background 0.12s, color 0.12s;
+        }
+        .src-del:hover { background: #FEF2F2; color: #EF4444; }
+
+        /* Render */
+        #renderBox {
+            width: 100%; height: 192px; border-radius: 14px; overflow: hidden;
+            position: relative; background: var(--surface);
+            border: 1px solid var(--border-md);
+        }
+        #renderPlaceholder {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 12px;
+        }
+        .scene { width: 56px; height: 56px; perspective: 150px; }
+        .cube-3d {
+            width: 100%; height: 100%; position: relative;
             transform-style: preserve-3d;
             animation: spin3d 10s linear infinite;
         }
@@ -59,176 +394,192 @@
             to   { transform: rotateX(22deg) rotateY(360deg); }
         }
         .face-3d {
-            position: absolute;
-            width: 64px; height: 64px;
-            border: 1px solid rgba(59,130,246,0.45);
-            background: rgba(59,130,246,0.03);
+            position: absolute; width: 56px; height: 56px;
+            border: 1px solid rgba(59,130,246,0.38);
+            background: rgba(59,130,246,0.025);
         }
-        .f-front  { transform: rotateY(  0deg) translateZ(32px); }
-        .f-back   { transform: rotateY(180deg) translateZ(32px); }
-        .f-right  { transform: rotateY( 90deg) translateZ(32px); }
-        .f-left   { transform: rotateY(-90deg) translateZ(32px); }
-        .f-top    { transform: rotateX( 90deg) translateZ(32px); }
-        .f-bottom { transform: rotateX(-90deg) translateZ(32px); }
+        .f-front  { transform: rotateY(  0deg) translateZ(28px); }
+        .f-back   { transform: rotateY(180deg) translateZ(28px); }
+        .f-right  { transform: rotateY( 90deg) translateZ(28px); }
+        .f-left   { transform: rotateY(-90deg) translateZ(28px); }
+        .f-top    { transform: rotateX( 90deg) translateZ(28px); }
+        .f-bottom { transform: rotateX(-90deg) translateZ(28px); }
+
+        .rnd-lbl {
+            font-family: 'DM Mono', monospace; font-size: 10px;
+            letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3);
+        }
+        #renderSpinner {
+            position: absolute; inset: 0;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center; gap: 8px;
+            background: var(--surface);
+        }
+        #renderFrame { width: 100%; height: 100%; border: 0; display: none; }
+        #renderDesc {
+            font-size: 11.5px; color: var(--text-2); line-height: 1.55;
+            text-align: center; display: none; margin-top: 8px;
+        }
+
+        /* Material dropdown */
+        .mat-dw-wrap { position: relative; margin-top: 10px; }
+        #matDropdownBtn {
+            width: 100%; display: flex; align-items: center;
+            justify-content: space-between; gap: 8px;
+            padding: 9px 12px; background: var(--surface-2);
+            border: 1px solid var(--border-md); border-radius: 11px;
+            font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-2);
+            cursor: pointer; box-shadow: var(--sh-sm);
+            transition: border-color 0.15s, color 0.15s;
+        }
+        #matDropdownBtn:hover { border-color: var(--accent); color: var(--accent); }
+        #matDropdown {
+            display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px);
+            background: var(--surface-2); border: 1px solid var(--border-md);
+            border-radius: 12px; box-shadow: var(--sh-lg); z-index: 50; overflow: hidden;
+        }
+        #matDropdown > div { padding: 5px; max-height: 210px; overflow-y: auto; }
+        .mat-option {
+            display: block; width: 100%; padding: 8px 11px; text-align: left;
+            font-family: 'DM Sans', sans-serif; font-size: 12.5px;
+            color: var(--text-2); background: transparent; border-radius: 8px;
+            transition: background 0.1s, color 0.1s; cursor: pointer; border: none;
+        }
+        .mat-option:hover { background: var(--accent-soft); color: var(--accent); }
+        .mat-option.selected { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+        /* Material tag in chat */
+        .material-tag {
+            color: var(--accent); font-weight: 600;
+            border-bottom: 1.5px dotted rgba(59,130,246,0.4);
+            cursor: pointer; transition: color 0.12s;
+        }
+        .material-tag:hover { color: #1D4ED8; }
+
+        /* Tip card */
+        #tipCard { background: var(--navy); border-radius: 16px; padding: 16px; color: #fff; }
+
+        /* Animations */
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(14px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+        .card-reveal { animation: floatIn 0.42s cubic-bezier(0.34,1.4,0.64,1) forwards; }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to   { opacity: 0; transform: translateY(-10px); }
+        }
+        .fade-out { animation: fadeOut 0.38s ease forwards; }
 
         @keyframes fadeInTip {
-            from { opacity: 0; transform: translateY(6px); }
+            from { opacity: 0; transform: translateY(5px); }
             to   { opacity: 1; transform: translateY(0); }
         }
-        .tip-anim { animation: fadeInTip 0.5s ease-out forwards; }
+        .tip-anim { animation: fadeInTip 0.4s ease-out forwards; }
 
-        .thin-scroll::-webkit-scrollbar { width: 3px; }
-        .thin-scroll::-webkit-scrollbar-track { background: transparent; }
-        .thin-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .mat-option {
-            display: block; width: 100%;
-            padding: 8px 14px; text-align: left;
-            font-family: 'Outfit', sans-serif; font-size: 12px;
-            color: #4b5563; background: transparent;
-            transition: background 0.1s, color 0.1s;
-        }
-        .mat-option:hover    { background: #eff6ff; color: #2563eb; }
-        .mat-option.selected { background: #eff6ff; color: #2563eb; font-weight: 600; }
-
-        .material-tag {
-            color: #2563eb; font-weight: 600;
-            border-bottom: 1.5px dotted #93c5fd;
-            cursor: pointer; transition: color 0.15s;
-        }
-        .material-tag:hover { color: #1d4ed8; }
+        @keyframes spinIcon { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 md:p-8">
+<body>
 
-<div class="w-full max-w-6xl h-full flex flex-col glass rounded-[32px] overflow-hidden">
+<div class="app">
 
-    <!-- Header -->
-    <header class="px-8 pt-8 pb-6 flex items-center justify-between border-b border-white/20 flex-shrink-0">
-        <div class="flex-1"></div>
-        <h1 style="line-height:1; text-align:center; text-shadow: 0 6px 10px rgba(0,0,0,0.10);">
-            <span style="font-family:'Exo 2',sans-serif; font-weight:800; font-size:5.2rem; color:#1F2937; letter-spacing:-3px;">ADE</span><span style="font-family:'Exo 2',sans-serif; font-size:5.2rem; font-weight:700; font-style:italic; color:#2563EB; margin-left:10px;">Bot</span>
-        </h1>
-        <div class="flex-1 flex justify-end gap-3">
-            <button type="button" title="Configuración" class="p-2 hover:bg-white rounded-full transition-all text-gray-400 hover:text-blue-600">
-                <i data-lucide="settings" class="w-5 h-5"></i>
-            </button>
-        </div>
+    <!-- HEADER -->
+    <header class="hdr">
+       
+        <div class="hdr-left"></div>
+        <div class="hdr-logo">ADE<span class="b">Bot</span><span class="dot">·</span></div>
+        <div style="flex:1;display:flex;justify-content:flex-end;"></div>
     </header>
 
-    <div class="flex-grow flex overflow-hidden">
+    <!-- BODY -->
+    <div class="body">
 
-        <!-- ── Sidebar izquierdo ── -->
-        <aside class="w-16 lg:w-60 border-r border-white/20 hidden md:flex flex-col p-4 flex-shrink-0 gap-4">
-
-            <button type="button" id="btnNuevoChat"
-                class="w-full flex items-center justify-center lg:justify-start gap-3 p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-200 flex-shrink-0">
-                <i data-lucide="square-pen" class="w-4 h-4 flex-shrink-0"></i>
-                <span class="text-sm font-medium hidden lg:block">Nueva conversación</span>
+        
+        <aside class="sl no-scroll">
+            
+            <button type="button" id="btnNuevoChat" class="btn-new">
+                <i data-lucide="square-pen" style="width:14px;height:14px;flex-shrink:0;"></i>
+                <span class="lbl">Nueva conversación</span>
             </button>
-
-            <div class="flex flex-col gap-2 overflow-hidden flex-grow">
-                <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-[0.16em] hidden lg:block">
-                    Conversaciones
-                </p>
-                <div id="historialChats" class="overflow-y-auto no-scrollbar flex flex-col gap-1.5 flex-grow"></div>
-            </div>
-
+            <span class="sl-label">Conversaciones</span>
+            <div id="historialChats" class="no-scroll"></div>
         </aside>
 
-        <!-- ── Área de chat ── -->
-        <main class="flex-grow flex flex-col overflow-hidden pb-10">
-
-            <div id="chatArea" class="flex-grow overflow-y-auto px-6 pt-4 pb-6 md:px-12 md:pt-5 md:pb-12 space-y-10 no-scrollbar">
-                <div id="bienvenida" class="card-reveal max-w-2xl space-y-4">
-                    <div class="h-[1px] bg-blue-100 w-20 animate-draw"></div>
-                    <h2 class="text-3xl md:text-4xl font-light text-gray-800 leading-tight">
-                        ¿Qué deseas <span class="text-blue-600 font-semibold underline decoration-blue-200 decoration-4 underline-offset-8">consultar</span> hoy?
-                    </h2>
-                    <p class="text-gray-500 text-lg">Respondo con base en los documentos oficiales del área de Ingeniería en Diseño.</p>
+        <!-- CHAT -->
+        <main class="chat-main">
+            <div id="chatArea" class="no-scroll">
+              
+                <div id="bienvenida" class="card-reveal">
+                    <div class="w-line"></div>
+                    <h2 class="w-title">¿Qué deseas <b>consultar</b> hoy?</h2>
+                    <p class="w-sub">Mis respuestas se sustentan en la documentación oficial del área y en los criterios de diseño aplicados en obras de construcción e ingeniería civil.</p>
                 </div>
             </div>
 
-            <!-- Input -->
-            <div class="px-6 pb-1 md:px-10 md:pb-2 pt-4 bg-gradient-to-t from-white via-white to-transparent flex-shrink-0">
-                <div class="max-w-3xl mx-auto">
-                    <div class="flex items-center bg-white border border-gray-200 rounded-[20px] p-2 pr-4 shadow-[0_2px_12px_rgba(0,0,0,0.07)]">
-                        <button type="button" id="btnUpload" title="Adjuntar PDF a esta conversación"
-                            class="p-3 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors flex-shrink-0">
-                            <i data-lucide="paperclip" class="w-5 h-5"></i>
+            <div class="inp-zone">
+                <div class="inp-wrap">
+                    <div class="inp-row">
+                        <button type="button" id="btnUpload" class="inp-att" title="Adjuntar PDF">
+                            <i data-lucide="paperclip" style="width:16px;height:16px;"></i>
                         </button>
-                        <input id="inputMsg" type="text"
-                            placeholder="Escribe tu consulta sobre Ingeniería en Diseño..."
-                            class="flex-grow bg-transparent border-none py-4 px-4 text-sm focus:outline-none text-gray-700 min-w-0">
-                        <button id="btnEnviar" type="button" title="Enviar mensaje"
-                            class="bg-blue-600 text-white p-3 rounded-xl hover:scale-105 transition-all shadow-md shadow-blue-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 flex-shrink-0">
-                            <i data-lucide="send" class="w-5 h-5"></i>
+                        <input id="inputMsg" type="text" placeholder="Escribe tu consulta sobre Ingeniería en Diseño…">
+                        <button id="btnEnviar" type="button" title="Enviar">
+                            <i data-lucide="arrow-up" style="width:16px;height:16px;"></i>
                         </button>
                     </div>
-                    <div class="flex justify-center mt-4">
-                        <span class="text-xs mono text-gray-400 tracking-wider flex items-center gap-2">
-                            Presiona <kbd class="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded text-xs">Enter</kbd> para enviar
-                        </span>
-                    </div>
+                    <div class="inp-hint">Presiona <kbd>Enter</kbd> para enviar</div>
                 </div>
             </div>
-
         </main>
 
-        <!-- ── Sidebar derecho ── -->
-        <aside class="w-72 border-l border-white/20 hidden lg:flex flex-col p-6 overflow-hidden flex-shrink-0 gap-6">
+        <!-- SIDEBAR RIGHT -->
+        <aside class="sr thin-scroll">
 
-            <!-- Fuentes -->
-            <section class="flex-shrink-0 flex flex-col gap-3">
-                <div id="listaFuentes" class="space-y-1.5 overflow-y-auto thin-scroll max-h-36"></div>
-                <div id="estadoVacioFuentes" class="hidden p-4 border-2 border-dashed border-gray-200 rounded-2xl text-center">
-                    <i data-lucide="file-plus" class="w-6 h-6 text-gray-300 mx-auto mb-1.5"></i>
-                    <p class="text-[11px] text-gray-400 leading-relaxed">
-                        Usa <i data-lucide="paperclip" class="w-3 h-3 inline -mt-0.5"></i> para adjuntar PDFs a esta sesión
+            <!-- Documentos -->
+            <section>
+                <p class="sr-sec-title">Documentos</p>
+                <div id="listaFuentes" style="overflow-y:auto;max-height:130px;"></div>
+                <div id="estadoVacioFuentes">
+                    <i data-lucide="file-plus" style="width:20px;height:20px;color:var(--text-3);display:block;margin:0 auto 6px;"></i>
+                    <p style="font-size:11px;color:var(--text-3);line-height:1.5;">
+                        Adjunta PDFs con <i data-lucide="paperclip" style="width:11px;height:11px;display:inline;vertical-align:middle;"></i> para esta sesión
                     </p>
                 </div>
             </section>
 
-            <!-- Render + Materiales -->
-            <section class="flex-shrink-0 flex flex-col gap-3">
-                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Render</h4>
-                <div id="renderBox" class="w-full rounded-2xl overflow-hidden relative" style="height:200px; background:#f8fafc; border:1px solid rgba(0,0,0,0.06)">
-                    <div id="renderPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center">
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:40px;">
-                            <div class="scene"><div class="cube-3d">
-                                <div class="face-3d f-front"></div><div class="face-3d f-back"></div>
-                                <div class="face-3d f-right"></div><div class="face-3d f-left"></div>
-                                <div class="face-3d f-top"></div><div class="face-3d f-bottom"></div>
-                            </div></div>
-                            <p class="text-[10px] text-gray-400 mono tracking-widest">Selecciona un material</p>
-                        </div>
+            <!-- Render 3D -->
+            <section>
+                <p class="sr-sec-title">Render 3D</p>
+                <div id="renderBox">
+                    <div id="renderPlaceholder">
+                        <div class="scene"><div class="cube-3d">
+                            <div class="face-3d f-front"></div><div class="face-3d f-back"></div>
+                            <div class="face-3d f-right"></div><div class="face-3d f-left"></div>
+                            <div class="face-3d f-top"></div><div class="face-3d f-bottom"></div>
+                        </div></div>
+                        <span class="rnd-lbl">Selecciona un material</span>
                     </div>
-                    <div id="renderSpinner" class="absolute inset-0 hidden flex-col items-center justify-center gap-2 bg-gray-50">
-                        <svg class="w-6 h-6 animate-spin text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                        </svg>
-                        <p class="text-[10px] text-gray-400 mono">Cargando modelo...</p>
+                    <div id="renderSpinner">
+                        <svg style="width:20px;height:20px;animation:spinIcon 1s linear infinite;color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                        <span class="rnd-lbl">Cargando…</span>
                     </div>
-                    <iframe id="renderFrame" class="w-full h-full border-0 hidden"
-                        allow="autoplay; fullscreen; xr-spatial-tracking"
+                    <iframe id="renderFrame" allow="autoplay; fullscreen; xr-spatial-tracking"
                         allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"
-                        title="Modelo 3D del material"></iframe>
+                        title="Modelo 3D"></iframe>
                 </div>
-                <!-- Selector de material -->
-                <div class="relative">
-                    <button type="button" id="matDropdownBtn" onclick="toggleMatDropdown()"
-                        class="w-full flex items-center justify-between gap-2 px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 hover:border-blue-300 hover:text-blue-600 transition-all shadow-sm">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="layers" class="w-4 h-4 text-gray-400"></i>
+
+                <div class="mat-dw-wrap">
+                    <button type="button" id="matDropdownBtn" onclick="toggleMatDropdown()">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <i data-lucide="layers" style="width:14px;height:14px;color:var(--text-3);flex-shrink:0;"></i>
                             <span id="matDropdownLabel">Seleccionar material</span>
                         </div>
-                        <i data-lucide="chevron-down" id="matChevron" class="w-4 h-4 text-gray-400 transition-transform"></i>
+                        <i data-lucide="chevron-down" id="matChevron" style="width:14px;height:14px;color:var(--text-3);transition:transform 0.2s;flex-shrink:0;"></i>
                     </button>
-                    <div id="matDropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
-                        <div class="py-1 max-h-52 overflow-y-auto thin-scroll">
+                    <div id="matDropdown">
+                        <div class="thin-scroll">
                             <button type="button" onclick="seleccionarMaterial('titanio',          'Titanio')"          class="mat-option">Titanio</button>
                             <button type="button" onclick="seleccionarMaterial('acero',            'Acero')"            class="mat-option">Acero</button>
                             <button type="button" onclick="seleccionarMaterial('aluminio',         'Aluminio')"         class="mat-option">Aluminio</button>
@@ -244,578 +595,377 @@
                         </div>
                     </div>
                 </div>
-                <p id="renderDesc" class="text-xs text-gray-500 leading-relaxed text-center hidden"></p>
+                <p id="renderDesc"></p>
             </section>
 
             <!-- Sobre el área -->
-            <section class="flex-shrink-0">
-                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Sobre el área</h4>
-                <div id="tipCard" class="bg-gray-900 rounded-2xl p-4 text-white"></div>
+            <section>
+                <p class="sr-sec-title">Sobre el área</p>
+                <div id="tipCard"></div>
             </section>
 
         </aside>
     </div>
 </div>
 
-
-<input type="file" id="fileInput" accept=".pdf" aria-label="Adjuntar archivo PDF" class="hidden">
+<input type="file" id="fileInput" accept=".pdf" aria-label="Adjuntar PDF" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;">
 
 <script>
 lucide.createIcons();
 
-// ─── Utilidades ───────────────────────────────────────────────────
-function genId()    { return Math.random().toString(36).slice(2); }
-function escapar(t) { const d = document.createElement('div'); d.appendChild(document.createTextNode(t)); return d.innerHTML; }
+/* ── Utils ── */
+function genId()    { return Math.random().toString(36).slice(2,10); }
+function esc(t)     { const d=document.createElement('div'); d.appendChild(document.createTextNode(t)); return d.innerHTML; }
 
-function mostrarToast(texto, tipo) {
-    const n = document.createElement('div');
-    n.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm
-        shadow-xl text-white ${tipo === 'ok' ? 'bg-green-600' : 'bg-red-500'}`;
-    n.textContent = texto;
-    document.body.appendChild(n);
-    setTimeout(() => n.remove(), 3500);
+function toast(txt, ok) {
+    const n=document.createElement('div');
+    n.style.cssText=`position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:9999;
+        padding:11px 18px;border-radius:12px;font-size:13px;font-family:'DM Sans',sans-serif;
+        font-weight:500;color:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.18);
+        background:${ok?'#15803D':'#DC2626'};`;
+    n.textContent=txt; document.body.appendChild(n);
+    setTimeout(()=>n.remove(),3200);
 }
 
-// ─── Estado global ────────────────────────────────────────────────
-let SESSION_ID       = genId();
-let sesionPreview    = '';
-let totalConsultas   = 0;
-let tipIndex         = 0;
-let mensajesActuales = [];                  // [{tipo:'usuario'|'bot', texto}]
-const conversaciones = {};                  // {sessionId: {preview, sessionId, mensajes}}
-const enHistorial    = new Set();           // sessionIds ya añadidos al historial UI
+/* ── State ── */
+let SESSION_ID     = genId();
+let sesionPreview  = '';
+let totalConsultas = 0;
+let tipIndex       = 0;
+let mensajesActuales = [];
+const conversaciones = {};
+const enHistorial    = new Set();
 
 const chatArea  = document.getElementById('chatArea');
 const inputMsg  = document.getElementById('inputMsg');
 const btnEnviar = document.getElementById('btnEnviar');
 
-// ─── Fuentes ──────────────────────────────────────────────────────
+/* ── Sources ── */
 async function cargarFuentes() {
     try {
-        const resp = await fetch(`/api/fuentes?session_id=${SESSION_ID}`);
-        const data = await resp.json();
-        renderFuentes(data.archivos);
-    } catch { /* servidor no disponible aún */ }
+        const r = await fetch(`/api/fuentes?session_id=${SESSION_ID}`);
+        const d = await r.json();
+        renderFuentes(d.archivos);
+    } catch { renderFuentes([]); }
 }
-
-function renderFuentes(archivos) {
+function renderFuentes(arr) {
     const lista = document.getElementById('listaFuentes');
     const vacio = document.getElementById('estadoVacioFuentes');
     lista.innerHTML = '';
-
-    if (archivos.length === 0) {
-        vacio.classList.remove('hidden');
-        return;
-    }
-    vacio.classList.add('hidden');
-
-   archivos.forEach(archivo => {
-            const nombre = archivo.filename || archivo;
-            const div = document.createElement('div');
-            div.className = 'flex items-center gap-2 p-2.5 bg-white rounded-xl border border-gray-100';
-            div.innerHTML = `
-                <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-500 flex-shrink-0"></i>
-                <span class="text-[11px] text-gray-600 truncate flex-grow" title="${nombre}">${nombre}</span>
-                <button onclick="eliminarFuente('${nombre}')"
-                    class="flex-shrink-0 p-0.5 text-gray-300 hover:text-red-400 transition-colors rounded"
-                    title="Eliminar">
-                    <i data-lucide="x" class="w-3 h-3"></i>
-                </button>`;
-            lista.appendChild(div);
-        });
+    if (!arr.length) { vacio.style.display=''; return; }
+    vacio.style.display='none';
+    arr.forEach(n => {
+        const d=document.createElement('div'); d.className='src-item';
+        d.innerHTML=`<i data-lucide="file-text" style="width:12px;height:12px;color:var(--accent);flex-shrink:0;"></i>
+            <span class="src-name" title="${esc(n)}">${esc(n)}</span>
+            <button class="src-del" onclick="eliminarFuente('${esc(n)}')" title="Eliminar">
+                <i data-lucide="x" style="width:10px;height:10px;"></i>
+            </button>`;
+        lista.appendChild(d);
+    });
     lucide.createIcons();
 }
-
-async function eliminarFuente(filename) {
-    await fetch(`/api/upload?session_id=${SESSION_ID}&filename=${encodeURIComponent(filename)}`, {
-        method: 'DELETE',
-    });
-    await cargarFuentes();
+async function eliminarFuente(fn) {
+    await fetch(`/api/upload?session_id=${SESSION_ID}&filename=${encodeURIComponent(fn)}`,{method:'DELETE'});
+    cargarFuentes();
 }
 
-// ─── Upload PDF ────────────────────────────────────────────────────
-document.getElementById('btnUpload').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
+/* ── Upload ── */
+document.getElementById('btnUpload').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const fi = document.getElementById('fileInput');
+    fi.value = '';
+    fi.click();
 });
-
 document.getElementById('fileInput').addEventListener('change', async e => {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
-
-    const btn = document.getElementById('btnUpload');
-    btn.disabled = true;
-    btn.innerHTML = `<svg class="w-5 h-5 animate-spin text-blue-500" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
-
+    const f=e.target.files[0]; if(!f) return;
+    const btn=document.getElementById('btnUpload');
+    btn.disabled=true;
+    btn.innerHTML=`<svg style="width:16px;height:16px;animation:spinIcon 1s linear infinite;color:var(--accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
     try {
-        const form = new FormData();
-        form.append('archivo', archivo);
-        form.append('session_id', SESSION_ID);
-
-        const resp = await fetch('/api/upload', { method: 'POST', body: form });
-        const data = await resp.json();
-
-        if (data.error) {
-            mostrarToast(data.error, 'error');
-        } else {
-            mostrarToast(`"${data.archivo}" cargado (${data.paginas} pág.)`, 'ok');
-            await cargarFuentes();
-        }
-    } catch {
-        mostrarToast('Error al subir el archivo.', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="paperclip" class="w-5 h-5"></i>';
-        lucide.createIcons();
-        e.target.value = '';
+        const fd=new FormData(); fd.append('archivo',f); fd.append('session_id',SESSION_ID);
+        const r=await fetch('/api/upload',{method:'POST',body:fd});
+        const d=await r.json();
+        if(d.error) toast(d.error,false);
+        else { toast(`"${d.archivo}" cargado (${d.paginas} pág.)`,true); cargarFuentes(); }
+    } catch { toast('Error al subir el archivo.',false); }
+    finally {
+        btn.disabled=false;
+        btn.innerHTML='<i data-lucide="paperclip" style="width:16px;height:16px;"></i>';
+        lucide.createIcons(); e.target.value='';
     }
 });
 
-// ─── Tips rotativos ────────────────────────────────────────────────
-const TIPS = [
-    {
-        titulo: 'Tolerancias dimensionales',
-        texto: 'Una tolerancia de ±0.01 mm puede determinar si un componente ensamblará correctamente o será rechazado en control de calidad.',
-        pregunta: '¿Qué son las tolerancias dimensionales y cómo se aplican en ingeniería del diseño?'
-    },
-    {
-        titulo: 'Análisis de elementos finitos',
-        texto: 'El FEA permite simular el comportamiento de una pieza bajo cargas antes de fabricarla, reduciendo hasta un 40% los costos de prototipado.',
-        pregunta: '¿Cómo funciona el análisis de elementos finitos en el diseño de piezas mecánicas?'
-    },
-    {
-        titulo: 'Regla del 10x en costos',
-        texto: 'Corregir un error en papel cuesta 1x. En prototipo cuesta 10x. En producción cuesta 100x. El diseño riguroso desde el inicio ahorra tiempo y dinero.',
-        pregunta: '¿Cómo impactan los errores de diseño en los costos de producción?'
-    },
-    {
-        titulo: 'Manufactura aditiva en metales',
-        texto: 'La impresión 3D con Inconel o titanio permite crear geometrías internas imposibles de lograr con mecanizado CNC convencional.',
-        pregunta: '¿Qué ventajas ofrece la manufactura aditiva en metales sobre el mecanizado CNC?'
-    },
-    {
-        titulo: 'Ergonomía en el diseño',
-        texto: 'Un producto que no considera la ergonomía del usuario tiene hasta 3 veces más probabilidades de ser rediseñado antes de llegar al mercado.',
-        pregunta: '¿Cómo se integra la ergonomía en el proceso de diseño de productos?'
-    },
-    {
-        titulo: 'Materiales compuestos',
-        texto: 'La fibra de carbono tiene una resistencia específica 5 veces mayor que el acero, lo que la hace ideal para aplicaciones aeroespaciales y automotrices.',
-        pregunta: '¿Cuáles son las ventajas de los materiales compuestos frente a los metálicos?'
-    },
-    {
-        titulo: 'Diseño para manufactura',
-        texto: 'Aplicar DFM desde la fase conceptual puede reducir el número de piezas de un ensamble hasta en un 50%, simplificando la cadena de producción.',
-        pregunta: '¿En qué consiste el diseño para manufactura y cuándo se aplica?'
-    },
-    {
-        titulo: 'Falla por fatiga',
-        texto: 'El 90% de las fallas mecánicas en servicio son causadas por fatiga. Identificar los puntos de concentración de esfuerzos desde el modelo 3D es esencial.',
-        pregunta: '¿Cómo se diseña un componente considerando la resistencia a la fatiga?'
-    },
+/* ── Tips ── */
+const TIPS=[
+    {titulo:'Tolerancias dimensionales', texto:'Una tolerancia de ±0.01 mm puede determinar si un componente ensamblará correctamente o será rechazado en control de calidad.', pregunta:'¿Qué son las tolerancias dimensionales y cómo se aplican en ingeniería del diseño?'},
+    {titulo:'Análisis de elementos finitos', texto:'El FEA permite simular el comportamiento de una pieza bajo cargas antes de fabricarla, reduciendo hasta un 40% los costos de prototipado.', pregunta:'¿Cómo funciona el análisis de elementos finitos en el diseño de piezas mecánicas?'},
+    {titulo:'Regla del 10x en costos', texto:'Corregir un error en papel cuesta 1×. En prototipo cuesta 10×. En producción cuesta 100×. El diseño riguroso desde el inicio ahorra tiempo y dinero.', pregunta:'¿Cómo impactan los errores de diseño en los costos de producción?'},
+    {titulo:'Manufactura aditiva en metales', texto:'La impresión 3D con Inconel o titanio permite crear geometrías internas imposibles de lograr con mecanizado CNC convencional.', pregunta:'¿Qué ventajas ofrece la manufactura aditiva en metales sobre el mecanizado CNC?'},
+    {titulo:'Ergonomía en el diseño', texto:'Un producto que no considera la ergonomía del usuario tiene hasta 3 veces más probabilidades de ser rediseñado antes de llegar al mercado.', pregunta:'¿Cómo se integra la ergonomía en el proceso de diseño de productos?'},
+    {titulo:'Materiales compuestos', texto:'La fibra de carbono tiene una resistencia específica 5 veces mayor que el acero, lo que la hace ideal para aplicaciones aeroespaciales y automotrices.', pregunta:'¿Cuáles son las ventajas de los materiales compuestos frente a los metálicos?'},
+    {titulo:'Diseño para manufactura', texto:'Aplicar DFM desde la fase conceptual puede reducir el número de piezas de un ensamble hasta en un 50%, simplificando la cadena de producción.', pregunta:'¿En qué consiste el diseño para manufactura y cuándo se aplica?'},
+    {titulo:'Falla por fatiga', texto:'El 90% de las fallas mecánicas en servicio son causadas por fatiga. Identificar los puntos de concentración de esfuerzos desde el modelo 3D es esencial.', pregunta:'¿Cómo se diseña un componente considerando la resistencia a la fatiga?'},
 ];
-
-function renderTip(index) {
-    const tip  = TIPS[index];
-    const card = document.getElementById('tipCard');
-    card.innerHTML = `
-        <div class="tip-anim flex flex-col gap-3">
-            <div class="flex items-center gap-2">
-                <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-400 flex-shrink-0"></i>
-                <span class="text-sm font-semibold text-blue-300 leading-tight">${tip.titulo}</span>
+function renderTip(i){
+    const t=TIPS[i];
+    document.getElementById('tipCard').innerHTML=`
+        <div class="tip-anim" style="display:flex;flex-direction:column;gap:11px;">
+            <div style="display:flex;align-items:center;gap:7px;">
+                <i data-lucide="zap" style="width:12px;height:12px;color:#93C5FD;flex-shrink:0;"></i>
+                <span style="font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;color:#93C5FD;">${t.titulo}</span>
             </div>
-            <p class="text-[11px] leading-relaxed text-gray-300">${tip.texto}</p>
+            <p style="font-size:11.5px;line-height:1.62;color:rgba(255,255,255,0.6);">${t.texto}</p>
             <button onclick="preguntarSobreTip()"
-                class="flex items-center justify-center gap-1.5 py-2.5 px-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-[11px] font-medium transition-colors">
-                <i data-lucide="message-circle" class="w-3 h-3"></i>
+                style="display:flex;align-items:center;justify-content:center;gap:6px;
+                padding:8px 12px;background:rgba(59,130,246,0.22);border:1px solid rgba(59,130,246,0.32);
+                border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+                color:#93C5FD;cursor:pointer;width:100%;transition:background 0.15s;"
+                onmouseover="this.style.background='rgba(59,130,246,0.38)'"
+                onmouseout="this.style.background='rgba(59,130,246,0.22)'">
+                <i data-lucide="message-circle" style="width:12px;height:12px;"></i>
                 Preguntarle al bot
             </button>
         </div>`;
     lucide.createIcons();
 }
-
-function preguntarSobreTip() {
-    inputMsg.value = TIPS[tipIndex].pregunta;
-    inputMsg.focus();
-}
-
+function preguntarSobreTip(){ inputMsg.value=TIPS[tipIndex].pregunta; inputMsg.focus(); }
 renderTip(0);
-setInterval(() => {
-    tipIndex = (tipIndex + 1) % TIPS.length;
-    renderTip(tipIndex);
-}, 30000);
+setInterval(()=>{ tipIndex=(tipIndex+1)%TIPS.length; renderTip(tipIndex); },30000);
 
-// ─── Nueva conversación ───────────────────────────────────────────
+/* ── New chat / history ── */
 document.getElementById('btnNuevoChat').addEventListener('click', crearNuevoChat);
 
-const BIENVENIDA = `
-    <div id="bienvenida" class="card-reveal max-w-2xl space-y-4">
-        <div class="h-[1px] bg-blue-100 w-20 animate-draw"></div>
-        <h2 class="text-3xl md:text-4xl font-light text-gray-800 leading-tight">
-            ¿Qué deseas <span class="text-blue-600 font-semibold underline decoration-blue-200 decoration-4 underline-offset-8">consultar</span> hoy?
-        </h2>
-        <p class="text-gray-500 text-lg">Respondo con base en los documentos oficiales del área de Ingeniería en Diseño.</p>
-    </div>`;
+const BIENVENIDA_HTML=`<div id="bienvenida" class="card-reveal"><div class="w-line"></div>
+    <h2 class="w-title">¿Qué deseas <b>consultar</b> hoy?</h2>
+    <p class="w-sub">Mis respuestas se sustentan en la documentación oficial del área y en los criterios de diseño aplicados en obras de construcción e ingeniería civil.</p></div>`;
 
-function guardarYArchivar() {
-    if (totalConsultas === 0) return;
-    const preview = sesionPreview || 'Conversación';
-    conversaciones[SESSION_ID] = {
-        preview,
-        sessionId: SESSION_ID,
-        mensajes:  [...mensajesActuales],
-    };
-    if (!enHistorial.has(SESSION_ID)) {
-        agregarAlHistorial(preview, SESSION_ID);
-        enHistorial.add(SESSION_ID);
-    }
+function guardarYArchivar(){
+    if(!totalConsultas) return;
+    const preview=sesionPreview||'Conversación';
+    conversaciones[SESSION_ID]={preview,sessionId:SESSION_ID,mensajes:[...mensajesActuales]};
+    if(!enHistorial.has(SESSION_ID)){ agregarAlHistorial(preview,SESSION_ID); enHistorial.add(SESSION_ID); }
 }
-
-function crearNuevoChat() {
+function crearNuevoChat(){
     guardarYArchivar();
-    SESSION_ID         = genId();
-    sesionPreview      = '';
-    totalConsultas     = 0;
-    mensajesActuales   = [];
-    btnEnviar.disabled = false;
-    renderFuentes([]);
-    marcarActivo(null);
-    chatArea.innerHTML = BIENVENIDA;
-    inputMsg.focus();
+    SESSION_ID=genId(); sesionPreview=''; totalConsultas=0; mensajesActuales=[];
+    btnEnviar.disabled=false; renderFuentes([]); marcarActivo(null);
+    chatArea.innerHTML=BIENVENIDA_HTML; inputMsg.focus();
 }
-
-function cargarConversacion(sessionId) {
-    const conv = conversaciones[sessionId];
-    if (!conv) return;
-
+function cargarConversacion(sid){
+    const c=conversaciones[sid]; if(!c) return;
     guardarYArchivar();
-
-    SESSION_ID       = conv.sessionId;
-    sesionPreview    = conv.preview;
-    totalConsultas   = conv.mensajes.length;
-    mensajesActuales = [...conv.mensajes];
-
-    chatArea.innerHTML = '';
-    conv.mensajes.forEach(m => {
-        if (m.tipo === 'usuario') renderMensaje('usuario', m.texto, false);
-        else                      renderMensaje('bot',     m.texto, false);
-    });
-    chatArea.scrollTop = chatArea.scrollHeight;
-
-    marcarActivo(sessionId);
-    cargarFuentes();
-    inputMsg.focus();
+    SESSION_ID=c.sessionId; sesionPreview=c.preview;
+    totalConsultas=c.mensajes.length; mensajesActuales=[...c.mensajes];
+    chatArea.innerHTML='';
+    c.mensajes.forEach(m=>renderMensaje(m.tipo,m.texto,false));
+    chatArea.scrollTop=chatArea.scrollHeight;
+    marcarActivo(sid); cargarFuentes(); inputMsg.focus();
 }
-
-function marcarActivo(sessionId) {
-    document.querySelectorAll('.historial-item').forEach(el => {
-        const activo = el.dataset.sid === sessionId;
-        el.classList.toggle('bg-white',     activo);
-        el.classList.toggle('bg-white/70', !activo);
-        el.classList.toggle('border-blue-200',  activo);
-        el.classList.toggle('border-gray-100/80', !activo);
+function marcarActivo(sid){
+    document.querySelectorAll('.h-item').forEach(el=>{
+        const a=el.dataset.sid===sid;
+        el.classList.toggle('hi-active',a);
     });
 }
-
-function agregarAlHistorial(preview, sessionId) {
-    const historial = document.getElementById('historialChats');
-    const div = document.createElement('div');
-    div.className = 'historial-item group flex items-center gap-2 p-3 bg-white/70 hover:bg-white rounded-xl cursor-pointer transition-colors border border-gray-100/80';
-    div.dataset.sid = sessionId;
-    div.innerHTML = `
-        <i data-lucide="message-square" class="w-4 h-4 text-blue-400 flex-shrink-0 hidden lg:block"></i>
-        <span class="label-conv text-sm text-gray-600 truncate flex-grow hidden lg:block" title="${preview}">${preview.slice(0, 20)}</span>
-        <div class="acciones flex gap-1 flex-shrink-0 invisible group-hover:visible hidden lg:flex">
-            <button class="btn-renombrar w-6 h-6 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-all" title="Renombrar">
-                <i data-lucide="pencil-line" class="w-3.5 h-3.5"></i>
-            </button>
-            <button class="btn-borrar w-6 h-6 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all" title="Eliminar">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-        </div>
-        <i data-lucide="message-square" class="w-4 h-4 text-blue-400 lg:hidden mx-auto"></i>`;
-
-    div.addEventListener('click', () => cargarConversacion(sessionId));
-
-    div.querySelector('.btn-borrar').addEventListener('click', e => {
-        e.stopPropagation();
-        borrarConversacion(sessionId, div);
-    });
-
-    div.querySelector('.btn-renombrar').addEventListener('click', e => {
-        e.stopPropagation();
-        renombrarConversacion(sessionId, div);
-    });
-
-    historial.insertBefore(div, historial.firstChild);
-    lucide.createIcons();
+function agregarAlHistorial(preview,sid){
+    const h=document.getElementById('historialChats');
+    const d=document.createElement('div'); d.className='h-item'; d.dataset.sid=sid;
+    d.innerHTML=`<i data-lucide="message-square" style="width:13px;height:13px;flex-shrink:0;opacity:0.55;"></i>
+        <span class="label-conv" title="${esc(preview)}">${esc(preview.slice(0,22))}</span>
+        <div class="acciones">
+            <button class="btn-renombrar" title="Renombrar"><i data-lucide="pencil-line" style="width:11px;height:11px;"></i></button>
+            <button class="btn-borrar"    title="Eliminar"><i data-lucide="trash-2"     style="width:11px;height:11px;"></i></button>
+        </div>`;
+    d.addEventListener('click',()=>cargarConversacion(sid));
+    d.querySelector('.btn-borrar').addEventListener('click',e=>{e.stopPropagation();borrarConversacion(sid,d);});
+    d.querySelector('.btn-renombrar').addEventListener('click',e=>{e.stopPropagation();renombrarConversacion(sid,d);});
+    h.insertBefore(d,h.firstChild); lucide.createIcons();
 }
-
-function borrarConversacion(sessionId, elemento) {
-    delete conversaciones[sessionId];
-    enHistorial.delete(sessionId);
-    elemento.remove();
-}
-
-function renombrarConversacion(sessionId, elemento) {
-    const label = elemento.querySelector('.label-conv');
-    const textoActual = conversaciones[sessionId]?.preview || label.textContent.trim();
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = textoActual;
-    input.className = 'text-sm text-gray-700 bg-transparent border-b border-blue-400 outline-none flex-grow min-w-0 hidden lg:block';
-
-    label.replaceWith(input);
-    elemento.querySelector('.acciones').classList.add('invisible');
-    input.focus();
-    input.select();
-
-    function confirmar() {
-        const nuevo = input.value.trim() || textoActual;
-        if (conversaciones[sessionId]) conversaciones[sessionId].preview = nuevo;
-
-        const nuevoLabel = document.createElement('span');
-        nuevoLabel.className = 'label-conv text-sm text-gray-600 truncate flex-grow hidden lg:block';
-        nuevoLabel.title = nuevo;
-        nuevoLabel.textContent = nuevo.slice(0, 20);
-        input.replaceWith(nuevoLabel);
-        elemento.querySelector('.acciones').classList.remove('invisible');
+function borrarConversacion(sid,el){ delete conversaciones[sid]; enHistorial.delete(sid); el.remove(); }
+function renombrarConversacion(sid,el){
+    const lbl=el.querySelector('.label-conv');
+    const prev=conversaciones[sid]?.preview||lbl.textContent.trim();
+    const inp=document.createElement('input');
+    inp.type='text'; inp.value=prev;
+    inp.style.cssText='font-size:12.5px;color:#fff;background:transparent;border-bottom:1px solid rgba(59,130,246,0.45);outline:none;flex:1;min-width:0;font-family:"DM Sans",sans-serif;';
+    lbl.replaceWith(inp);
+    el.querySelector('.acciones').style.visibility='hidden';
+    inp.focus(); inp.select();
+    function ok(){
+        const nv=inp.value.trim()||prev;
+        if(conversaciones[sid]) conversaciones[sid].preview=nv;
+        const nl=document.createElement('span'); nl.className='label-conv'; nl.title=nv; nl.textContent=nv.slice(0,22);
+        inp.replaceWith(nl); el.querySelector('.acciones').style.visibility='';
     }
-
-    input.addEventListener('blur', confirmar);
-    input.addEventListener('keydown', e => {
-        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-        if (e.key === 'Escape') { input.value = textoActual; input.blur(); }
-    });
+    inp.addEventListener('blur',ok);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();inp.blur();}if(e.key==='Escape'){inp.value=prev;inp.blur();}});
 }
 
-// ─── Materiales 3D ────────────────────────────────────────────────
-// Cada entrada expone: label (nombre visible) y desc (descripción técnica).
-// El visor 3D usa Sketchfab embeds; ver MATERIALES_SKETCHFAB para los UIDs.
-const MATERIALES_3D = {
-    'fibra de carbono': { label: 'Fibra de Carbono',    desc: 'Material compuesto de alta resistencia específica, 5× más resistente que el acero.' },
-    'titanio':          { label: 'Titanio',             desc: 'Metal ligero de alta resistencia, biocompatible y resistente a la corrosión.' },
-    'acero':            { label: 'Acero',               desc: 'Aleación de hierro y carbono, base estructural de la industria moderna.' },
-    'inconel':          { label: 'Inconel',             desc: 'Superaleación de níquel-cromo para aplicaciones de alta temperatura.' },
-    'aluminio':         { label: 'Aluminio',            desc: 'Metal ligero y resistente a la corrosión, ampliamente usado en aeronáutica.' },
-    'cobre':            { label: 'Cobre',               desc: 'Excelente conductor eléctrico y térmico, base de la electrónica.' },
-    'polímero':         { label: 'Polímero',            desc: 'Macromolécula de amplio uso en manufactura de piezas ligeras y flexibles.' },
-    'plástico':         { label: 'Plástico',            desc: 'Material sintético moldeable, ligero y de bajo costo de producción.' },
-    'cerámica':         { label: 'Cerámica',            desc: 'Material inorgánico de alta dureza, resistente al calor y desgaste.' },
-    'compuesto':        { label: 'Material Compuesto',  desc: 'Combinación de dos o más materiales que supera las propiedades individuales.' },
-    'magnesio':         { label: 'Magnesio',            desc: 'El metal estructural más ligero, ideal para piezas automotrices y aeroespaciales.' },
-    'resina':           { label: 'Resina',              desc: 'Polímero termoendurecible usado como matriz en materiales compuestos.' },
-    'bronce':           { label: 'Bronce',              desc: 'Aleación de cobre y estaño, alta resistencia a la corrosión y buenas propiedades de fundición.' },
-    'acero inoxidable': { label: 'Acero Inoxidable',   desc: 'Aleación de acero con cromo (≥10.5%), altamente resistente a la corrosión y oxidación.' },
+/* ── Materials ── */
+const MAT={
+    'fibra de carbono':{label:'Fibra de Carbono',desc:'Material compuesto de alta resistencia específica, 5× más resistente que el acero.'},
+    'titanio':         {label:'Titanio',          desc:'Metal ligero de alta resistencia, biocompatible y resistente a la corrosión.'},
+    'acero':           {label:'Acero',            desc:'Aleación de hierro y carbono, base estructural de la industria moderna.'},
+    'inconel':         {label:'Inconel',          desc:'Superaleación de níquel-cromo para aplicaciones de alta temperatura.'},
+    'aluminio':        {label:'Aluminio',         desc:'Metal ligero y resistente a la corrosión, ampliamente usado en aeronáutica.'},
+    'cobre':           {label:'Cobre',            desc:'Excelente conductor eléctrico y térmico, base de la electrónica.'},
+    'polímero':        {label:'Polímero',         desc:'Macromolécula de amplio uso en manufactura de piezas ligeras y flexibles.'},
+    'plástico':        {label:'Plástico',         desc:'Material sintético moldeable, ligero y de bajo costo de producción.'},
+    'cerámica':        {label:'Cerámica',         desc:'Material inorgánico de alta dureza, resistente al calor y desgaste.'},
+    'compuesto':       {label:'Material Compuesto',desc:'Combinación de dos o más materiales que supera las propiedades individuales.'},
+    'magnesio':        {label:'Magnesio',         desc:'El metal estructural más ligero, ideal para piezas automotrices y aeroespaciales.'},
+    'resina':          {label:'Resina',           desc:'Polímero termoendurecible usado como matriz en materiales compuestos.'},
+    'bronce':          {label:'Bronce',           desc:'Aleación de cobre y estaño, alta resistencia a la corrosión.'},
+    'acero inoxidable':{label:'Acero Inoxidable', desc:'Aleación de acero con cromo ≥10.5%, resistente a la corrosión y oxidación.'},
+};
+const SFAB={
+    'fibra de carbono':'9e83dc5cc4514e1093af02d80904baf1',
+    'titanio':         '499a74a828dc42af9c2ceaa23069f6e0',
+    'acero':           '33f84d01ec834d8c98c39ee7251f8ff4',
+    'aluminio':        'eed5b25371d84671b46ad6d55fa3b692',
+    'cobre':           '91807ce330af449bbd3c59b5ede8ce67',
+    'inconel':         '42c58371d2c148efac53eff84a7d9c12',
+    'polímero':        '4ad0d0a804d24e25a34809f740a59151',
+    'plástico':        '4ad0d0a804d24e25a34809f740a59151',
+    'cerámica':        'abb01376e70846399b97e0d77396e9af',
+    'magnesio':        '9f5798f8c95041c096a060f47366c94e',
+    'resina':          '9ca1906eda1543fca14184b2beb08b33',
+    'compuesto':       '9e83dc5cc4514e1093af02d80904baf1',
+    'bronce':          '4f0c61a3419c44a7bf9cbb44ba435772',
+    'acero inoxidable':'408da6a9b2f04a6f92e3a0f305df53de',
 };
 
-function procesarTextoBot(texto) {
-    let html = escapar(texto);
-
-    // Primera mención de cada material → span cliqueable; usando placeholders para no corromper el HTML
-    const keywords = Object.keys(MATERIALES_3D).sort((a, b) => b.length - a.length);
-    const spans = {};
-    let idx = 0;
-    keywords.forEach(kw => {
-        const esc = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        html = html.replace(new RegExp(esc, 'i'), match => {
-            const ph = '%%MAT_' + (idx++) + '%%';
-            spans[ph] = '<span class="material-tag" onclick="seleccionarMaterial(\'' + kw + '\',\'' + MATERIALES_3D[kw].label + '\')">'+match+'<\/span>';
+function procesarTextoBot(txt){
+    let h=esc(txt);
+    const kws=Object.keys(MAT).sort((a,b)=>b.length-a.length);
+    const sps={}; let idx=0;
+    kws.forEach(kw=>{
+        const re=new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i');
+        h=h.replace(re,m=>{
+            const ph='%%M'+idx+'%%'; idx++;
+            sps[ph]='<span class="material-tag" onclick="seleccionarMaterial(\''+kw+'\',\''+MAT[kw].label+'\')">'+m+'</span>';
             return ph;
         });
     });
-
-    // Negrita **texto**
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-    // Restaurar spans de materiales
-    Object.entries(spans).forEach(function(e) { html = html.split(e[0]).join(e[1]); });
-
-    return html;
+    h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    Object.entries(sps).forEach(([k,v])=>{h=h.split(k).join(v);});
+    return h;
 }
 
-// ─── Dropdown de materiales ───────────────────────────────────────
-function toggleMatDropdown() {
-    const dd  = document.getElementById('matDropdown');
-    const ch  = document.getElementById('matChevron');
-    const open = !dd.classList.contains('hidden');
-    dd.classList.toggle('hidden', open);
-    ch.style.transform = open ? '' : 'rotate(180deg)';
+function toggleMatDropdown(){
+    const dd=document.getElementById('matDropdown');
+    const ch=document.getElementById('matChevron');
+    const open=dd.style.display==='block';
+    dd.style.display=open?'none':'block';
+    ch.style.transform=open?'':'rotate(180deg)';
 }
-
-function seleccionarMaterial(key, label) {
-    document.getElementById('matDropdownLabel').textContent = label;
-    document.getElementById('matDropdown').classList.add('hidden');
-    document.getElementById('matChevron').style.transform = '';
-    document.querySelectorAll('.mat-option').forEach(b =>
-        b.classList.toggle('selected', b.textContent.trim() === label)
-    );
+function seleccionarMaterial(key,label){
+    document.getElementById('matDropdownLabel').textContent=label;
+    document.getElementById('matDropdown').style.display='none';
+    document.getElementById('matChevron').style.transform='';
+    document.querySelectorAll('.mat-option').forEach(b=>b.classList.toggle('selected',b.textContent.trim()===label));
     verMaterial3D(key);
 }
-
-document.addEventListener('click', e => {
-    if (!e.target.closest('#matDropdownBtn') && !e.target.closest('#matDropdown')) {
-        document.getElementById('matDropdown')?.classList.add('hidden');
-        document.getElementById('matChevron').style.transform = '';
+document.addEventListener('click',e=>{
+    if(!e.target.closest('#matDropdownBtn')&&!e.target.closest('#matDropdown')){
+        const dd=document.getElementById('matDropdown');
+        if(dd){ dd.style.display='none'; document.getElementById('matChevron').style.transform=''; }
     }
 });
 
-// ─── Render 3D — Sketchfab embeds ─────────────────────────────────
-const MATERIALES_SKETCHFAB = {
-    'fibra de carbono': '9e83dc5cc4514e1093af02d80904baf1', // Material Carbon Fiber – OrbArts
-    'titanio':          '499a74a828dc42af9c2ceaa23069f6e0', // Metal Ingot – Kigha
-    'acero':            '33f84d01ec834d8c98c39ee7251f8ff4', // Construction Steel Beam
-    'aluminio':         'eed5b25371d84671b46ad6d55fa3b692', // T-Slot Aluminium Extrusion
-    'cobre':            '91807ce330af449bbd3c59b5ede8ce67', // Copper Pipe Section
-    'inconel':          '42c58371d2c148efac53eff84a7d9c12', // Turbine Engine Blade – pira.midale
-    'polímero':         '4ad0d0a804d24e25a34809f740a59151', // Plastic Material
-    'plástico':         '4ad0d0a804d24e25a34809f740a59151',
-    'cerámica':         'abb01376e70846399b97e0d77396e9af', // Ceramic With Texture
-    'magnesio':         '9f5798f8c95041c096a060f47366c94e', // Magnesium element – SciencesADB972
-    'resina':            '9ca1906eda1543fca14184b2beb08b33', // XYZ RGB Dragon – moldeado en resina
-    'compuesto':         '9e83dc5cc4514e1093af02d80904baf1',
-    'bronce':            '4f0c61a3419c44a7bf9cbb44ba435772', // Bronze Valve – Aleksey
-    'acero inoxidable':  '408da6a9b2f04a6f92e3a0f305df53de', // Stainless Steel Coil
-};
+function verMaterial3D(key){
+    const cfg=MAT[key]; if(!cfg) return;
+    const uid=SFAB[key];
+    const frame=document.getElementById('renderFrame');
+    const ph=document.getElementById('renderPlaceholder');
+    const spinner=document.getElementById('renderSpinner');
 
-function verMaterial3D(key) {
-    const cfg = MATERIALES_3D[key];
-    if (!cfg) return;
-
-    const uid   = MATERIALES_SKETCHFAB[key];
-    const frame = document.getElementById('renderFrame');
-    const ph    = document.getElementById('renderPlaceholder');
-
-    if (uid) {
-        const spinner = document.getElementById('renderSpinner');
-        const src = `https://sketchfab.com/models/${uid}/embed?autostart=1&ui_infos=0&ui_controls=0&ui_stop=0&preload=1&dnt=1`;
-        const isNew = frame.getAttribute('src') !== src;
-        if (isNew) {
-            frame.classList.add('hidden');
-            spinner.classList.remove('hidden');
-            spinner.classList.add('flex');
-            frame.onload = () => {
-                spinner.classList.add('hidden');
-                spinner.classList.remove('flex');
-                frame.classList.remove('hidden');
-            };
-            frame.setAttribute('src', src);
-        } else {
-            frame.classList.remove('hidden');
-        }
-        ph.classList.add('hidden');
+    if(uid){
+        const src=`https://sketchfab.com/models/${uid}/embed?autostart=1&ui_infos=0&ui_controls=0&ui_stop=0&preload=1&dnt=1`;
+        const isNew=frame.getAttribute('src')!==src;
+        if(isNew){
+            frame.style.display='none';
+            spinner.style.display='flex';
+            frame.onload=()=>{ spinner.style.display='none'; frame.style.display='block'; };
+            frame.setAttribute('src',src);
+        } else { frame.style.display='block'; }
+        ph.style.display='none';
+        spinner.style.display = isNew ? 'flex' : 'none';
     }
 
-    const desc = document.getElementById('renderDesc');
-    desc.textContent = cfg.desc;
-    desc.classList.remove('hidden');
+    const desc=document.getElementById('renderDesc');
+    desc.textContent=cfg.desc; desc.style.display='block';
 }
 
-// ─── Chat ──────────────────────────────────────────────────────────
-function renderMensaje(tipo, texto, animado = true) {
-    const div = document.createElement('div');
-    if (tipo === 'usuario') {
-        div.className = (animado ? 'card-reveal ' : '') + 'flex justify-end';
-        div.innerHTML = `
-            <div class="bg-gray-900 text-white px-6 py-4 rounded-2xl rounded-tr-none shadow-xl max-w-lg">
-                <p class="text-sm font-light">${escapar(texto)}</p>
-            </div>`;
+/* ── Chat rendering ── */
+function renderMensaje(tipo, txt, anim=true){
+    const div=document.createElement('div');
+    if(tipo==='usuario'){
+        div.className=(anim?'card-reveal ':'')+'msg-u';
+        div.innerHTML=`<div class="bbl-u">${esc(txt)}</div>`;
     } else {
-        div.className = (animado ? 'card-reveal ' : '') + 'relative max-w-4xl pl-36';
-        div.innerHTML = `
-            <img src="/static/icon.png" alt="Juanito el Inge"
-                class="absolute top-0 left-0 w-40 h-40 object-contain object-top">
-            <div class="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
-                <div class="space-y-2">
-                    <h3 class="text-xs font-semibold text-blue-500 tracking-wide">Juanito el Inge</h3>
-                    <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">${procesarTextoBot(texto)}</p>
-                </div>
+        div.className=(anim?'card-reveal ':'')+'msg-b';
+        div.innerHTML=`
+            <div class="b-av">
+                <img src="/static/icon.png" alt="Juanito" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="b-av-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">J</div>
+            </div>
+            <div class="b-wrap">
+                <span class="b-name">Juanito el Inge</span>
+                <div class="b-bbl"><span style="white-space:pre-wrap;">${procesarTextoBot(txt)}</span></div>
             </div>`;
     }
     chatArea.appendChild(div);
-    if (tipo === 'bot') {
-        const top = div.getBoundingClientRect().top - chatArea.getBoundingClientRect().top + chatArea.scrollTop - 16;
-        chatArea.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-    } else {
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
+    if(tipo==='bot'){
+        const top=div.getBoundingClientRect().top-chatArea.getBoundingClientRect().top+chatArea.scrollTop-16;
+        chatArea.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+    } else { chatArea.scrollTop=chatArea.scrollHeight; }
 }
 
-function agregarMensajeUsuario(texto) {
-    mensajesActuales.push({ tipo: 'usuario', texto });
-    renderMensaje('usuario', texto, true);
-}
+function agregarMensajeUsuario(t){ mensajesActuales.push({tipo:'usuario',texto:t}); renderMensaje('usuario',t,true); }
+function agregarMensajeBot(t)    { mensajesActuales.push({tipo:'bot',texto:t});     renderMensaje('bot',t,true); }
 
-function agregarMensajeBot(texto) {
-    mensajesActuales.push({ tipo: 'bot', texto });
-    renderMensaje('bot', texto, true);
-}
-
-function mostrarCargando() {
-    const div = document.createElement('div');
-    div.id = 'cargando';
-    div.className = 'max-w-4xl relative pl-36';
-    div.innerHTML = `
-        <img src="/static/icon.png" alt="Juanito el Inge"
-            class="absolute top-0 left-0 w-40 h-40 object-contain object-top">
-        <div class="bg-white rounded-[24px] p-8 shadow-sm border border-gray-100">
-            <div class="flex flex-col gap-1.5">
-                <span class="text-xs text-gray-400 font-medium">El inge está pensando...</span>
-                <div class="flex gap-2">
-                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></span>
-                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay:.15s"></span>
-                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay:.3s"></span>
+function mostrarCargando(){
+    const div=document.createElement('div'); div.id='cargando'; div.className='msg-b';
+    div.innerHTML=`
+        <div class="b-av">
+            <img src="/static/icon.png" alt="Juanito" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="b-av-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">J</div>
+        </div>
+        <div class="b-wrap">
+            <span class="b-name">Juanito el Inge</span>
+            <div class="b-bbl">
+                <div class="typing-wrap">
+                    <span class="typing-lbl">Procesando consulta…</span>
+                    <div class="dots"><span></span><span></span><span></span></div>
                 </div>
             </div>
         </div>`;
-    chatArea.appendChild(div);
-    chatArea.scrollTop = chatArea.scrollHeight;
+    chatArea.appendChild(div); chatArea.scrollTop=chatArea.scrollHeight;
 }
+function ocultarCargando(){ document.getElementById('cargando')?.remove(); }
 
-function ocultarCargando() { document.getElementById('cargando')?.remove(); }
-
-async function enviar() {
-    const texto = inputMsg.value.trim();
-    if (!texto || btnEnviar.disabled) return;
-
-    if (!sesionPreview) sesionPreview = texto;
-    totalConsultas++;
-
-    const bienvenida = document.getElementById('bienvenida');
-    if (bienvenida) {
-        bienvenida.classList.add('fade-out');
-        setTimeout(() => bienvenida.remove(), 480);
-    }
-    agregarMensajeUsuario(texto);
-    inputMsg.value     = '';
-    btnEnviar.disabled = true;
-    mostrarCargando();
-
+async function enviar(){
+    const txt=inputMsg.value.trim(); if(!txt||btnEnviar.disabled) return;
+    if(!sesionPreview) sesionPreview=txt; totalConsultas++;
+    const bv=document.getElementById('bienvenida');
+    if(bv){ bv.classList.add('fade-out'); setTimeout(()=>bv.remove(),380); }
+    agregarMensajeUsuario(txt); inputMsg.value=''; btnEnviar.disabled=true; mostrarCargando();
     try {
-        const resp = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mensaje: texto, session_id: SESSION_ID }),
-        });
-        const data = await resp.json();
-        ocultarCargando();
-        agregarMensajeBot(data.respuesta);
-    } catch {
-        ocultarCargando();
-        agregarMensajeBot('Ocurrió un error al procesar tu consulta. Intenta nuevamente.');
-    } finally {
-        btnEnviar.disabled = false;
-        inputMsg.focus();
-    }
+        const r=await fetch('/api/chat',{method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({mensaje:txt,session_id:SESSION_ID})});
+        const d=await r.json(); ocultarCargando(); agregarMensajeBot(d.respuesta);
+    } catch { ocultarCargando(); agregarMensajeBot('Ocurrió un error al procesar tu consulta. Intenta nuevamente.'); }
+    finally { btnEnviar.disabled=false; inputMsg.focus(); }
 }
 
-// ─── Inicialización ───────────────────────────────────────────────
 btnEnviar.addEventListener('click', enviar);
-inputMsg.addEventListener('keydown', e => { if (e.key === 'Enter') enviar(); });
+inputMsg.addEventListener('keydown', e=>{ if(e.key==='Enter') enviar(); });
 inputMsg.focus();
 cargarFuentes();
 </script>
-
 </body>
 </html>
