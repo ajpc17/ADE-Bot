@@ -14,37 +14,15 @@ from infrastructure.llm_client import GeminiLLMClient, GroqLLMClient
 from infrastructure.log_repository import SQLiteLogRepository
 from infrastructure.vector_store import ChromaVectorStore
 from services.chat_service import ChatService
-from services.session_store import SessionDocumentStore
 
 load_dotenv()
 
-DEFAULT_CHROMA_PATH = "./db/chroma"
-DEFAULT_SQLITE_PATH = "./db/logs.db"
-ALLOWED_FILE_EXTENSIONS = {
-    ".pdf",
-    ".txt",
-    ".docx",
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".glb",
-    ".gltf",
-    ".obj",
-}
+Path(os.getenv("SQLITE_PATH", "./db/logs.db")).parent.mkdir(parents=True, exist_ok=True)
 
-session_store = SessionDocumentStore()
+_chat_service: ChatService | None = None
 
-
-class MensajeRequest(BaseModel):
-    mensaje: str
-    session_id: str = "anonimo"
-
-
-class Modelo3DReference(BaseModel):
-    session_id: str = "anonimo"
-    referencia: str
-    titulo: str | None = None
-    descripcion: str | None = None
+# Documentos por sesion: {session_id: {filename: [paginas_texto]}}
+_session_docs: dict[str, dict[str, list[str]]] = {}
 
 
 def _crear_llm_client() -> GeminiLLMClient | GroqLLMClient:
@@ -55,13 +33,9 @@ def _crear_llm_client() -> GeminiLLMClient | GroqLLMClient:
             api_key=groq_key,
             model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
         )
-    if gemini_key:
-        return GeminiLLMClient(
-            api_key=gemini_key,
-            model=os.getenv("GEMINI_MODEL", "gemini-2.5-pro"),
-        )
-    raise RuntimeError(
-        "Debe configurar GROQ_API_KEY o GEMINI_API_KEY en el entorno antes de iniciar la aplicación."
+    return GeminiLLMClient(
+        api_key=os.getenv("GEMINI_API_KEY"),
+        model=os.getenv("GEMINI_MODEL", "gemini-2.5-pro"),
     )
 
 
@@ -71,23 +45,16 @@ def _obtener_chroma_api_key() -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    chroma_path = os.getenv("CHROMA_PATH", DEFAULT_CHROMA_PATH)
-    sqlite_path = os.getenv("SQLITE_PATH", DEFAULT_SQLITE_PATH)
-    Path(sqlite_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(chroma_path).mkdir(parents=True, exist_ok=True)
-
-    vector_store = ChromaVectorStore(
-        path=chroma_path,
-        api_key=_obtener_chroma_api_key(),
-        model="gemini-embedding-001",
-    )
-    llm_client = _crear_llm_client()
-    log_repository = SQLiteLogRepository(path=sqlite_path)
-
-    app.state.chat_service = ChatService(
-        vector_store=vector_store,
-        llm_client=llm_client,
-        log_repository=log_repository,
+    global _chat_service
+    _chat_service = ChatService(
+        vector_store=ChromaVectorStore(
+            path=os.getenv("CHROMA_PATH"),
+            api_key=os.getenv("GEMINI_API_KEY"),  # los embeddings siempre usan Google aunque el LLM sea Groq
+        ),
+        llm_client=_crear_llm_client(),
+        log_repository=SQLiteLogRepository(
+            path=os.getenv("SQLITE_PATH"),
+        ),
         top_k=int(os.getenv("TOP_K", 4)),
         similarity_threshold=float(os.getenv("SIMILARITY_THRESHOLD", 0.60)),
     )
@@ -105,9 +72,17 @@ async def index():
 
 @app.post("/api/chat")
 async def chat(request: MensajeRequest):
-    contexto_extra = await session_store.format_context(request.session_id)
+    session_docs = _session_docs.get(request.session_id, {})
+    contexto_extra = ""
+    if session_docs:
+        partes = [
+            f"[{fname}]\n" + "\n".join(chunks)
+            for fname, chunks in session_docs.items()
+        ]
+        contexto_extra = "\n\n---\n\n".join(partes)
+
     user_id = abs(hash(request.session_id)) % (2 ** 31)
-    respuesta = await app.state.chat_service.procesar_consulta(
+    respuesta = await _chat_service.procesar_consulta(
         texto=request.mensaje,
         user_id=user_id,
         contexto_extra=contexto_extra,
@@ -117,17 +92,8 @@ async def chat(request: MensajeRequest):
 
 @app.get("/api/fuentes")
 async def fuentes(session_id: str = "anonimo"):
-    documentos = await session_store.list(session_id)
-    return {
-        "archivos": [
-            {
-                "filename": documento.filename,
-                "resource_type": documento.resource_type,
-                "metadata": documento.metadata,
-            }
-            for documento in documentos
-        ]
-    }
+    archivos = list(_session_docs.get(session_id, {}).keys())
+    return {"archivos": archivos}
 
 
 @app.post("/api/upload")
@@ -140,51 +106,16 @@ async def upload(archivo: UploadFile = File(...), session_id: str = Form("anonim
         )
 
     contenido = await archivo.read()
-    try:
-        documentos = cargar_documento_desde_bytes(archivo.filename, contenido)
-    except ValueError as exc:
-        raise HTTPException(status_code=415, detail=str(exc)) from exc
+    chunks = _extraer_texto_pdf(contenido)
 
-    if not documentos:
-        raise HTTPException(
-            status_code=422,
-            detail=f"No se pudo extraer texto o metadatos del archivo {archivo.filename}.",
-        )
+    if not chunks:
+        return JSONResponse({"error": "No se pudo extraer texto del PDF."}, status_code=422)
 
-    chunks = [document.page_content for document in documentos]
-    resource_type = "modelo_3d" if extension in {".glb", ".gltf", ".obj"} else "imagen" if extension in {".png", ".jpg", ".jpeg"} else "documento"
-    await session_store.add(
-        session_id=session_id,
-        filename=archivo.filename,
-        chunks=chunks,
-        resource_type=resource_type,
-        metadata={"fuente": archivo.filename},
-    )
+    if session_id not in _session_docs:
+        _session_docs[session_id] = {}
+    _session_docs[session_id][archivo.filename] = chunks
 
-    return {"archivo": archivo.filename, "fragmentos": len(chunks), "resource_type": resource_type}
-
-
-@app.post("/api/resource/3d")
-async def registrar_modelo_3d(request: Modelo3DReference):
-    referencia = request.referencia.strip()
-    if not referencia:
-        raise HTTPException(status_code=422, detail="La referencia 3D es obligatoria.")
-
-    filename = f"3D:{request.titulo or referencia}"
-    chunks = [
-        f"Modelo 3D: {request.titulo or referencia}",
-        f"Referencia: {referencia}",
-        f"Descripción: {request.descripcion or 'Recurso 3D relacionado con el área de Ingeniería en Diseño.'}",
-        "Este recurso debe considerarse un elemento interactivo de diseño y materiales.",
-    ]
-    await session_store.add(
-        session_id=request.session_id,
-        filename=filename,
-        chunks=chunks,
-        resource_type="modelo_3d",
-        metadata={"referencia": referencia, "titulo": request.titulo or "n/a"},
-    )
-    return {"archivo": filename, "resource_type": "modelo_3d"}
+    return {"archivo": archivo.filename, "paginas": len(chunks)}
 
 
 @app.delete("/api/upload")

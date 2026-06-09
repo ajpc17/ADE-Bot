@@ -53,7 +53,11 @@ def ejecutar(docs_path: str | None = None) -> None:
 
     chunk_size = os.getenv("INGEST_CHUNK_SIZE", "2000")
     chunk_overlap = os.getenv("INGEST_CHUNK_OVERLAP", "250")
+<<<<<<< HEAD
+    embedding_model = os.getenv("GOOGLE_GENAI_EMBEDDING_MODEL", "gemini-embedding-2-preview")
+=======
     embedding_model = os.getenv("GOOGLE_GENAI_EMBEDDING_MODEL", "gemini-embedding-001")
+>>>>>>> upstream/master
     print(f"Usando modelo de embedding: {embedding_model}")
     print(f"Usando chunk size: {chunk_size}, overlap: {chunk_overlap}")
 
@@ -82,11 +86,12 @@ def ejecutar(docs_path: str | None = None) -> None:
     if Path(chroma_path).exists():
         shutil.rmtree(chroma_path)
 
-    Chroma.from_documents(
-        documents=fragmentos_totales,
-        embedding=embeddings,
-        persist_directory=chroma_path,
+    vectorstore = Chroma(
+        collection_name="mi_coleccion",
+        embedding_function=embeddings,
+        persist_directory=str(chroma_path),
     )
+    vectorstore.add_documents(fragmentos_totales)
 
     print(f"\nIngesta completada. {len(fragmentos_totales)} fragmentos indexados.")
 

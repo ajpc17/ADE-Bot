@@ -13,10 +13,17 @@ class VectorStore(ABC):
 
 
 class ChromaVectorStore(VectorStore):
+<<<<<<< HEAD
+    def __init__(self, path: str, api_key: str):
+        embeddings = GoogleGenAIEmbeddings(
+            api_key=api_key,
+            model=os.getenv("GOOGLE_GENAI_EMBEDDING_MODEL", "gemini-embedding-2-preview"),
+=======
     def __init__(self, path: str, api_key: str, model: str = "gemini-embedding-001"):
         embeddings = GoogleGenAIEmbeddings(
             api_key=api_key,
             model=model,
+>>>>>>> upstream/master
         )
         print(f"[DEBUG] ChromaVectorStore using embedding model: {model}")
         self._db = Chroma(persist_directory=path, embedding_function=embeddings)
@@ -29,6 +36,17 @@ class ChromaVectorStore(VectorStore):
                 consulta,
                 k=top_k,
             )
+<<<<<<< HEAD
+        except Exception:
+            return []
+
+        fragmentos = []
+        for doc, score in resultados:
+            if score < threshold:
+                continue
+            fuente = doc.metadata.get("fuente") or doc.metadata.get("source") or "documento"
+            fragmentos.append(f"{doc.page_content}\n[Fuente: {fuente}]")
+=======
         except Exception as exc:
             print("[DEBUG] Chroma search error:", repr(exc))
             return []
@@ -44,4 +62,5 @@ class ChromaVectorStore(VectorStore):
             fragmentos.append(f"{doc.page_content}\n[Fuente: {fuente}]")
 
         print(f"[DEBUG] ChromaVectorStore.buscar returning {len(fragmentos)} fragmentos after threshold filtering")
+>>>>>>> upstream/master
         return fragmentos
