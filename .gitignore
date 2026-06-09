@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *.db
 db/chroma/
+db/chroma_test/
+db/sessions/
 datos/
 .venv/
 venv/
